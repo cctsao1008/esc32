@@ -19,7 +19,6 @@
 #include "serial.h"
 #include "config.h"
 #include "stm32f10x_dma.h"
-#include "stm32f10x_conf.h"
 #include "misc.h"
 #include <stdio.h>
 #include <stdlib.h>

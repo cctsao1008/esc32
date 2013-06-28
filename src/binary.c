@@ -95,8 +95,8 @@ void binaryProcessAck(void) {
 }
 
 void binaryTelemSend(void) {
-    uint8_t *c;
-    int i;
+    //uint8_t *c;
+    //int i;
 
     serialWrite(outChkA);
     serialWrite(outChkB);

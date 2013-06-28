@@ -38,7 +38,10 @@ volatile uint8_t state, inputMode;
 
 char buf[64];
 
-void main(void) {
+int main(void) {
+    statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
+	errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
+	
     rccInit();
     timerInit();
     configInit();
@@ -63,9 +66,9 @@ void main(void) {
 
     pwmInit();
 
-    statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
+    //statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
     digitalHi(statusLed);
-    errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
+    //errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
     digitalHi(errorLed);
 #ifdef ESC_DEBUG
     tp = digitalInit(GPIO_TP_PORT, GPIO_TP_PIN);
@@ -75,14 +78,14 @@ void main(void) {
     // self calibrating idle timer loop
     {
         volatile unsigned long cycles;
-        volatile unsigned int *DWT_CYCCNT = (int *)0xE0001004;
-        volatile unsigned int *DWT_CONTROL = (int *)0xE0001000;
-        volatile unsigned int *SCB_DEMCR = (int *)0xE000EDFC;
+        volatile unsigned int *DWT_CYCCNT = (unsigned int *)0xE0001004;
+        volatile unsigned int *DWT_CONTROL = (unsigned int *)0xE0001000;
+        volatile unsigned int *SCB_DEMCR = (unsigned int *)0xE000EDFC;
 
         *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
         *DWT_CONTROL = *DWT_CONTROL | 1;	// enable the counter
 
-	minCycles = 0xffff;
+        minCycles = 0xffff;
         while (1) {
             idleCounter++;
 
@@ -97,6 +100,8 @@ void main(void) {
                 minCycles = cycles;
         }
     }
+	
+	return 0;
 }
 
 #ifdef USE_FULL_ASSERT

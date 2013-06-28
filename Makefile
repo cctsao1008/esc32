@@ -48,36 +48,39 @@ VPATH		:= $(SRC_DIR)
 #
 
 # Tool names
-CC		 = arm-none-eabi-gcc
-OBJCOPY		 = arm-none-eabi-objcopy
+CC			= arm-none-eabi-gcc
+OBJCOPY			= arm-none-eabi-objcopy
 
 #
 # Tool options.
 #
-INCLUDE_DIRS	 = $(SRC_DIR)
+INCLUDE_DIRS		= $(SRC_DIR)
 
-ARCH_FLAGS	 = -mthumb -mcpu=cortex-m3
-BASE_CFLAGS		 = $(ARCH_FLAGS) \
-		   $(addprefix -D,$(OPTIONS)) \
-		   $(addprefix -I,$(INCLUDE_DIRS)) \
-		   -Wall \
-		   -ffunction-sections \
-		   -fdata-sections \
-		   -DSTM32F10X_MD \
-		   -DUSE_STDPERIPH_DRIVER \
-		   -D$(TARGET)
+ARCH_FLAGS		= -mthumb -mcpu=cortex-m3
+BASE_CFLAGS		= $(ARCH_FLAGS) \
+			$(addprefix -D,$(OPTIONS)) \
+			$(addprefix -I,$(INCLUDE_DIRS)) \
+			-Wall \
+			-ffunction-sections \
+			-fdata-sections \
+			-DSTM32F10X_MD \
+			-DUSE_STDPERIPH_DRIVER \
+			-D$(TARGET)
 
-ASFLAGS		 = $(ARCH_FLAGS) \
-		   -x assembler-with-cpp \
-		   $(addprefix -I,$(INCLUDE_DIRS))
+ASFLAGS			= $(ARCH_FLAGS) \
+			-x assembler-with-cpp \
+			$(addprefix -I,$(INCLUDE_DIRS))
 
 # XXX Map/crossref output?
-LD_SCRIPT	 = $(ROOT)/stm32_flash.ld
-LDFLAGS		 = -lm \
-		   $(ARCH_FLAGS) \
-		   -static \
-		   -Wl,-gc-sections \
-		   -T$(LD_SCRIPT)
+LD_SCRIPT		= $(ROOT)/stm32_flash.ld
+LDFLAGS			= -lm \
+			$(ARCH_FLAGS) \
+			-static \
+			-Wl,-gc-sections  \
+			--specs=nano.specs \
+			-u _printf_float \
+			-u _scanf_float \
+			-T$(LD_SCRIPT)
 
 ###############################################################################
 # No user-serviceable parts below
@@ -100,8 +103,8 @@ CFLAGS = $(BASE_CFLAGS) \
 endif
 
 
-TARGET_HEX	 = $(BIN_DIR)/hyon_$(TARGET).hex
-TARGET_ELF	 = $(BIN_DIR)/hyon_$(TARGET).elf
+TARGET_HEX	 = $(BIN_DIR)/$(TARGET).hex
+TARGET_ELF	 = $(BIN_DIR)/$(TARGET).elf
 TARGET_OBJS	 = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $($(TARGET)_SRC))))
 
 # List of buildable ELF files and their object dependencies.
@@ -123,11 +126,12 @@ $(OBJECT_DIR)/$(TARGET)/%.o: %.c
 $(OBJECT_DIR)/$(TARGET)/%.o: %.s
 	@mkdir -p $(dir $@)
 	@echo %% $(notdir $<)
-	@$(CC) -c -o $@ $(ASFLAGS) $< 
+	@$(CC) -c -o $@ $(ASFLAGS) $<
+
 $(OBJECT_DIR)/$(TARGET)/%.o): %.S
 	@mkdir -p $(dir $@)
 	@echo %% $(notdir $<)
-	@$(CC) -c -o $@ $(ASFLAGS) $< 
+	@$(CC) -c -o $@ $(ASFLAGS) $<
 
 clean:
 	rm -f $(TARGET_HEX) $(TARGET_ELF) $(TARGET_OBJS)

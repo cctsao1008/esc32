@@ -143,7 +143,7 @@ void owReadComplete(void) {
 
 	case OW_VERSION:
 	    owState = OW_WRITE;
-	    owBufPointer = version;
+	    owBufPointer = (uint8_t *)version;
 	    owWriteBytes(sizeof(version));
 	break;
 
@@ -182,10 +182,10 @@ void owReadComplete(void) {
 		owLastCommand = 0x00;
 		if (owBuf[1] < CONFIG_NUM_PARAMS) {
 		    // set parameter
-		    configSetParamByID(owBuf[1], *(float *)(&owBuf[2]));
+		    configSetParamByID(owBuf[1], (float)owBuf[2]);
 
 		    // copy config value into send buffer
-		    pointer = (uint8_t *)&p[owBuf[1]];
+		    pointer = (uint8_t *)&(p[owBuf[1]]);
 		    owBuf[2] = pointer[0];
 		    owBuf[3] = pointer[1];
 		    owBuf[4] = pointer[2];

@@ -13,12 +13,13 @@
     You should have received a copy of the GNU General Public License
     along with AutoQuad ESC32.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright © 2011, 2012  Bill Nesbitt
+    Copyright © 2011, 2012, 2013  Bill Nesbitt
 */
 
 #include "main.h"
 #include "adc.h"
 #include "fet.h"
+#include "run.h"
 #include "digital.h"
 #include "timer.h"
 #include "config.h"
@@ -78,7 +79,7 @@ void adcInit(void) {
     ADC_InitTypeDef ADC_InitStructure;
     DMA_InitTypeDef DMA_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
-    int i;
+    //int i;
 
     adcSetConstants();
     histSize = ADC_HIST_SIZE;
@@ -250,8 +251,8 @@ void adcEvaluateHistSize(void) {
 #pragma GCC optimize ("-O1")
 void DMA1_Channel1_IRQHandler(void) {
     register uint16_t *raw = (uint16_t *)adcRawData;
-    register uint32_t valA, valB, valC, valCOMP;
-    int ampsFlag = 0;
+    register uint32_t valA, valB, valC; //, valCOMP;
+    //int ampsFlag = 0;
     uint32_t currentMicros;
 
     __asm volatile ("cpsid i");
@@ -277,6 +278,9 @@ void DMA1_Channel1_IRQHandler(void) {
 #endif
 
     DMA1->IFCR = DMA1_IT_GL1 | DMA1_IT_TC1 | DMA1_IT_HT1;
+
+    if (runMode == SERVO_MODE)
+	return;
 
     // blanking time after commutation
     if (!fetCommutationMicros || ((currentMicros >= fetCommutationMicros) ? (currentMicros - fetCommutationMicros) : (TIMER_MASK - fetCommutationMicros + currentMicros)) > adcblankingMicros) {
