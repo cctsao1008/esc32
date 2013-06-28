@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with AutoQuad.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright © 2011  Bill Nesbitt
+    Copyright © 2011, 2012  Bill Nesbitt
 */
 
 #ifndef _GNU_SOURCE
@@ -144,10 +144,14 @@ void serialWriteChar(serialStruct_t *s, unsigned char c) {
 	ret = write(s->fd, &c, 1);
 }
 
-void serialWrite(serialStruct_t *s, const char *str, unsigned int len) {
+void serialWrite(serialStruct_t *s, char *str, unsigned int len) {
 	char ret;
 
 	ret = write(s->fd, str, len);
+}
+
+void serialPrint(serialStruct_t *s, char *str) {
+	serialWrite(s, str, strlen(str));
 }
 
 unsigned char serialAvailable(serialStruct_t *s) {

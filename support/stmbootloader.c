@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with AutoQuad.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright © 2011  Bill Nesbitt
+    Copyright © 2011, 2012  Bill Nesbitt
 */
 
 #ifndef _GNU_SOURCE
@@ -27,7 +27,7 @@
 #include <ctype.h>
 
 #define STM_RETRIES_SHORT	1000
-#define STM_RETRIES_LONG	50000
+#define STM_RETRIES_LONG	5000
 
 unsigned char getResults[11];
 
@@ -39,15 +39,8 @@ unsigned char stmHexToChar(const char *hex) {
 	hex1 = toupper(hex[0]);
 	hex2 = toupper(hex[1]);
 
-	if (hex1 < 65)
-		nibble1 = hex1 - 48;
-	else
-		nibble1 = hex1 - 55;
-
-	if (hex2 < 65)
-		nibble2 = hex2 - 48;
-	else
-		nibble2 = hex2 - 55;
+	nibble1 = hex1 - ((hex1 <  65) ? 48 : 55);
+	nibble2 = hex2 - ((hex2 <  65) ? 48 : 55);
 
 	return (nibble1 << 4 | nibble2);
 }
@@ -69,17 +62,17 @@ unsigned char stmWaitAck(serialStruct_t *s, int retries) {
 				return 0;
 			}
 			else {
-				printf("?%x?", c); fflush(stdout);
+				printf("?%02x?", c); fflush(stdout);
 				return 0;
 			}
 		}
-		usleep(500);
+		usleep(1000);
 	}
 
 	return 0;
 }
 
-unsigned char stmWrite(serialStruct_t *s, const char *hex) {
+unsigned char stmWriteString(serialStruct_t *s, const char *hex) {
 	unsigned char c;
 	unsigned char ck;
 	unsigned char i;
@@ -102,47 +95,108 @@ unsigned char stmWrite(serialStruct_t *s, const char *hex) {
 	return stmWaitAck(s, STM_RETRIES_LONG);
 }
 
-void stmWriteCommand(serialStruct_t *s, char *msb, char *lsb, char *len, char *data) {
-	char startAddress[9];
-	char lenPlusData[128];
-	char c;
+int stmWriteLen(serialStruct_t *s, char *data, int len, unsigned char ck) {
+	unsigned char c;
+	int i;
 
-	strncpy(startAddress, msb, sizeof(startAddress));
-	strcat(startAddress, lsb);
+	for (i = 0; i < len; i++) {
+		c = data[i];
+		ck ^= c;
+		serialWrite(s, (char *)&c, 1);
+	}
+	serialWrite(s, (char *)&ck, 1);
 
-	sprintf(lenPlusData, "%02x%s", stmHexToChar(len) - 1, data);
+	return stmWaitAck(s, STM_RETRIES_LONG);
+}
 
-	write:
-	// send WRITE MEMORY command
+void stmSendData(serialStruct_t *s, unsigned int addr, char *buf, int len) {
+	unsigned char c;
+	unsigned char ck;
+	unsigned char a[4];
+
+	printf("Writing address %x for %d bytes\n", addr, len);
+
+	sendRetry:
+
 	do {
 		c = getResults[5];
-		serialWrite(s, &c, 1);
+		serialWrite(s, (char *)&c, 1);
 		c = 0xff ^ c;
-		serialWrite(s, &c, 1);
+		serialWrite(s, (char *)&c, 1);
 	} while (!stmWaitAck(s, STM_RETRIES_LONG));
 
 	// send address
-	if (!stmWrite(s, startAddress)) {
-		putchar('A');
-		goto write;
+	// reverse byte order
+	a[0] = *(((unsigned char *)&addr)+3);
+	a[1] = *(((unsigned char *)&addr)+2);
+	a[2] = *(((unsigned char *)&addr)+1);
+	a[3] = *(((unsigned char *)&addr)+0);
+	if (!stmWriteLen(s, (char *)&a, 4, 0)) {
+		printf("Address error\n");
+		goto sendRetry;
 	}
 
-	// send len + data
-	if (!stmWrite(s, lenPlusData)) {
-		putchar('D');
-		goto write;
-	}
+	// send len
+	ck = 0;
+	c = len - 1;
+	serialWrite(s, (char *)&c, 1);
+	ck ^= c;
 
-	putchar('='); fflush(stdout);
+	// send data
+	if (!stmWriteLen(s, buf, len, ck)) {
+		printf("Data error\n");
+		goto sendRetry;
+	}
 }
 
+void stmWriteBuffer(serialStruct_t *s, char *msb, char *lsb, char *len, char *data) {
+	static unsigned char buf[256];
+	static unsigned int startAddr = 0;
+	static unsigned int length = 0;
+	unsigned int newAddr;
+	int offset;
+	int n;
+	int i;
+
+	// flush if called with 0 address
+	if (msb == 0  && lsb == 0 && startAddr) {
+		stmSendData(s, startAddr, (char *)buf, length);
+		startAddr = 0;
+		length = 0;
+		return;
+	}
+
+	n = stmHexToChar(len);
+
+	newAddr = stmHexToChar(&msb[0])<<24 | stmHexToChar(&msb[2])<<16 | stmHexToChar(&lsb[0])<<8 | stmHexToChar(&lsb[2]);
+
+	// is this new data within our current block?
+	if (newAddr != (startAddr+length) || (newAddr+n) > (startAddr+256)) {
+		// flush
+		if (startAddr)
+			stmSendData(s, startAddr, (char *)buf, length);
+
+		// clear buffer
+		memset(buf, 0xff, 256);
+
+		startAddr = newAddr;
+		length = 0;
+	}
+
+	offset = newAddr - startAddr;
+
+	for (i = 0; i < n; i++)
+		buf[offset+i] = stmHexToChar(&data[i*2]);
+
+	length = offset + n;
+}
+
+// interpret Intel Hex file
 char *stmHexLoader(serialStruct_t *s, FILE *fp) {
 	char hexByteCount[3], hexAddressLSB[5], hexRecordType[3], hexData[128];
 	char addressMSB[5];
 	static char addressJump[9];
 
-//	bzero(addressJump, sizeof(addressJump));
-//	bzero(addressMSB, sizeof(addressMSB));
 	memset(addressJump, 0, sizeof(addressJump));
 	memset(addressMSB, 0, sizeof(addressMSB));
 
@@ -152,10 +206,9 @@ char *stmHexLoader(serialStruct_t *s, FILE *fp) {
 		recordType = stmHexToChar(hexRecordType);
 		hexData[stmHexToChar(hexByteCount) * 2] = 0;	// terminate at CHKSUM
 
-//		printf("Record Type: %d\n", recordType);
 		switch (recordType) {
 			case 0x00:
-				stmWriteCommand(s, addressMSB, hexAddressLSB, hexByteCount, hexData);
+				stmWriteBuffer(s, addressMSB, hexAddressLSB, hexByteCount, hexData);
 				break;
 			case 0x01:
 				// EOF
@@ -166,16 +219,21 @@ char *stmHexLoader(serialStruct_t *s, FILE *fp) {
 				strncpy(addressMSB, hexData, 4);
 				break;
 			case 0x05:
+				// flush
+				stmWriteBuffer(s, 0, 0, 0, 0);
 				// 32 bit address to run after load
 				strncpy(addressJump, hexData, 8);
 				break;
 		}
 	}
 
+	// flush
+	stmWriteBuffer(s, 0, 0, 0, 0);
+
 	return 0;
 }
 
-void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsigned char noSendR) {
+void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsigned char cont) {
 	char c;
 	unsigned char b1, b2, b3;
 	unsigned char i, n;
@@ -185,27 +243,24 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 	if (!overrideParity)
 		serialEvenParity(s);
 
-	if(!noSendR) {
-		top:
-		printf("Sending R to place Baseflight in bootloader, press a key to continue");
-		serialFlush(s);
-		c = 'R';
-		serialWrite(s, &c, 1);
+	top:
+
+	// only if not continuing previous session
+	if (!cont) {
+		printf("Place STM in bootloader mode and press any key >");
 		getchar();
 		printf("\n");
+
+		serialFlush(s);
+
+		// poke the MCU
+		do {
+			printf("p"); fflush(stdout);
+			c = 0x7f;
+			serialWrite(s, &c, 1);
+		} while (!stmWaitAck(s, STM_RETRIES_SHORT));
+		printf("STM bootloader alive...\n");
 	}
-
-	serialFlush(s);
-	
-	printf("Poking the MCU to check whether bootloader is alive...");
-
-	// poke the MCU
-	do {
-		printf("p"); fflush(stdout);
-		c = 0x7f;
-		serialWrite(s, &c, 1);
-	} while (!stmWaitAck(s, STM_RETRIES_SHORT));
-	printf("STM bootloader alive...\n");
 
 	// send GET command
 	do {
@@ -217,45 +272,49 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 
 	b1 = serialRead(s);	// number of bytes
 	b2 = serialRead(s);	// bootloader version
+	printf("STM Bootloader version: %d.%d\n", (b2 & 0xf0) >> 4, (b2 & 0x0f));
 
+	printf("Getting %d commands.\n", b1);
 	for (i = 0; i < b1; i++)
 		getResults[i] = serialRead(s);
 
 	stmWaitAck(s, STM_RETRIES_LONG);
-	printf("Received commands.\n");
-
-
-	// send GET VERSION command
-	do {
-		c = getResults[1];
-		serialWrite(s, &c, 1);
-		c = 0xff ^ c;
-		serialWrite(s, &c, 1);
-	} while (!stmWaitAck(s, STM_RETRIES_LONG));
-	b1 = serialRead(s);
-	b2 = serialRead(s);
-	b3 = serialRead(s);
-	stmWaitAck(s, STM_RETRIES_LONG);
-	printf("STM Bootloader version: %d.%d\n", (b1 & 0xf0) >> 4, (b1 & 0x0f));
+	printf("Commands received.\n");
 
 	// send GET ID command
+	printf("Getting ID\n");
 	do {
 		c = getResults[2];
 		serialWrite(s, &c, 1);
 		c = 0xff ^ c;
 		serialWrite(s, &c, 1);
 	} while (!stmWaitAck(s, STM_RETRIES_LONG));
+
 	n = serialRead(s);
 	printf("STM Device ID: 0x");
-	for (i = 0; i <= n; i++) {
-		b1 = serialRead(s);
-		printf("%02x", b1);
-	}
+	for (i = 0; i <= n; i++)
+		printf("%02x", serialRead(s));
 	stmWaitAck(s, STM_RETRIES_LONG);
 	printf("\n");
 
 /*
+	// Enable ROP
+	printf("Sending enable ROP\n");
+	c = getResults[9];
+	serialWrite(s, &c, 1);
+	c = 0xff ^ c;
+	serialWrite(s, &c, 1);
+
+	if (!stmWaitAck(s, STM_RETRIES_LONG))
+		printf("ROP already active\n");
+	else if (!stmWaitAck(s, STM_RETRIES_LONG))
+		printf("Enable ROP failed\n");
+	else
+		goto top;
+*/
+
 	flash_size:
+
 	// read Flash size
 	c = getResults[3];
 	serialWrite(s, &c, 1);
@@ -264,13 +323,14 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 
 	// if read not allowed, unprotect (which also erases)
 	if (!stmWaitAck(s, STM_RETRIES_LONG)) {
+		printf("ROP unprotect\n");
+
 		// unprotect command
-		do {
-			c = getResults[10];
-			serialWrite(s, &c, 1);
-			c = 0xff ^ c;
-			serialWrite(s, &c, 1);
-		} while (!stmWaitAck(s, STM_RETRIES_LONG));
+		c = getResults[10];
+		serialWrite(s, &c, 1);
+		c = 0xff ^ c;
+		serialWrite(s, &c, 1);
+		stmWaitAck(s, STM_RETRIES_LONG);
 
 		// wait for results
 		if (stmWaitAck(s, STM_RETRIES_LONG))
@@ -278,17 +338,16 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 	}
 
 	// send address
-	if (!stmWrite(s, "1FFFF7E0"))
+	if (!stmWriteString(s, "1FFFF7E0"))
 		goto flash_size;
 
 	// send # bytes (N-1 = 1)
-	if (!stmWrite(s, "01"))
+	if (!stmWriteString(s, "01"))
 		goto flash_size;
 
 	b1 = serialRead(s);
 	b2 = serialRead(s);
 	printf("STM Flash Size: %dKB\n", b2<<8 | b1);
-*/
 
 	// erase flash
 	erase_flash:
@@ -303,7 +362,7 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 	// global erase
 	if (getResults[6] == 0x44) {
 		// mass erase
-		if (!stmWrite(s, "FFFF"))
+		if (!stmWriteString(s, "FFFF"))
 			goto erase_flash;
 	}
 	else {
@@ -322,7 +381,7 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 	printf("Flashing device...\n");
 	jumpAddress = stmHexLoader(s, fp);
 	if (jumpAddress) {
-		printf("\nFlash complete, cycle power\n");
+		printf("\nFlash complete, restarting.\n");
 
 		go:
 		// send GO command
@@ -334,7 +393,7 @@ void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsign
 		} while (!stmWaitAck(s, STM_RETRIES_LONG));
 
 		// send address
-		if (!stmWrite(s, jumpAddress))
+		if (!stmWriteString(s, jumpAddress))
 			goto go;
 	}
 	else {

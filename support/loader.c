@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with AutoQuad.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright © 2011  Bill Nesbitt
+    Copyright © 2011, 2012  Bill Nesbitt
 */
 
 #include "serial.h"
@@ -35,11 +35,11 @@ serialStruct_t *s;
 char port[256];
 unsigned int baud;
 unsigned char overrideParity;
-unsigned char noSendR;
+unsigned char cont;
 char firmFile[256];
 
 void loaderUsage(void) {
-	fprintf(stderr, "usage: loader <-h> <-p device_file> <-b baud_rate> <-f firmware_file> <-o> <-n>\n");
+	fprintf(stderr, "usage: loader <-h> <-p device_file> <-b baud_rate> <-f firmware_file> <-o>\n");
 }
 
 unsigned int loaderOptions(int argc, char **argv) {
@@ -48,21 +48,20 @@ unsigned int loaderOptions(int argc, char **argv) {
 	strncpy(port, DEFAULT_PORT, sizeof(port));
 	baud = DEFAULT_BAUD;
 	overrideParity = 0;
-	noSendR = 0;
 	strncpy(firmFile, FIRMWARE_FILENAME, sizeof(firmFile));
 
 	/* options descriptor */
 	static struct option longopts[] = {
-		{ "help",					required_argument,	NULL,		'h' },
-		{ "port",					required_argument,	NULL,		'p' },
-		{ "baud",					required_argument,	NULL,		's' },
-		{ "firm_file",				required_argument,	NULL,		'f' },
-		{ "override_parity",		no_argument,			NULL,		'o' },
-		{ "no_send_r",				no_argument,			NULL,		'n' },
-		{ NULL,						0,							NULL,		0 }
+		{ "help",	required_argument,	NULL,           'h' },
+		{ "port",	required_argument,	NULL,           'p' },
+		{ "baud",	required_argument,      NULL,           's' },
+		{ "firm_file",	required_argument,	NULL,           'f' },
+		{ "cont",	no_argument,		NULL,		'c' },
+		{ "overide_party",no_argument,		NULL,           'o' },
+		{ NULL,         0,                      NULL,           0 }
 	};
 
-	while ((ch = getopt_long(argc, argv, "hp:b:f:o:n", longopts, NULL)) != -1)
+	while ((ch = getopt_long(argc, argv, "hp:b:f:co", longopts, NULL)) != -1)
 		switch (ch) {
 		case 'h':
 			loaderUsage();
@@ -77,11 +76,11 @@ unsigned int loaderOptions(int argc, char **argv) {
 		case 'f':
 			strncpy(firmFile, optarg, sizeof(firmFile));
 			break;
+		case 'c':
+			cont = 1;
+			break;
 		case 'o':
 			overrideParity = 1;
-			break;
-		case 'n':
-			noSendR = 1;
 			break;
 		default:
 			loaderUsage();
@@ -99,24 +98,23 @@ int main(int argc, char **argv) {
 	// init
 	if (!loaderOptions(argc, argv)) {
 		fprintf(stderr, "Init failed, aborting\n");
-		return 1;
+		return 0;
 	}
 
-	s = initSerial(port, baud, 0);
-	if (!s) {
-		fprintf(stderr, "Cannot open serial port '%s', aborting.\n", port);
-		return 1;
+	if ((s = initSerial(port, baud, 0)) == 0) {
+		printf("Cannot open port '%s', aborting.\n", port);
+		return 0;
 	}
 
 	fw = fopen(firmFile, "r");
 	if (!fw) {
-		fprintf(stderr, "Cannot open firmware file '%s', aborting.\n", firmFile);
-		return 1;
+		printf("Cannot open firmware file '%s', aborting.\n", firmFile);
+		return 0;
 	}
 	else {
 		printf("Upgrading STM on port %s from %s...\n", port, firmFile);
-		stmLoader(s, fw, overrideParity, noSendR);
+		stmLoader(s, fw, overrideParity, cont);
 	}
 
-	return 0;
+	return 1;
 }

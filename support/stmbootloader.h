@@ -13,26 +13,15 @@
     You should have received a copy of the GNU General Public License
     along with AutoQuad.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright © 2011  Bill Nesbitt
+    Copyright © 2011, 2012  Bill Nesbitt
 */
 
-#ifndef _serial_h
-#define _serial_h
+#ifndef _stmbootloader_h
+#define _stmbootloader_h
 
-#define INPUT_BUFFER_SIZE	1024
+#include <stdio.h>
+#include "serial.h"
 
-typedef struct {
-	int fd;
-} serialStruct_t;
-
-extern serialStruct_t *initSerial(const char *port, unsigned int baud, char ctsRts);
-extern void serialWrite(serialStruct_t *s, const char *str, unsigned int len);
-extern void serialWriteChar(serialStruct_t *s, unsigned char c);
-extern unsigned char serialAvailable(serialStruct_t *s);
-extern void serialFlush(serialStruct_t *s);
-extern unsigned char serialRead(serialStruct_t *s);
-extern void serialEvenParity(serialStruct_t *s);
-extern void serialNoParity(serialStruct_t *s);
-extern void serialFree(serialStruct_t *s);
+extern void stmLoader(serialStruct_t *s, FILE *fp, unsigned char overrideParity, unsigned char cont);
 
 #endif
