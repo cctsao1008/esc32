@@ -438,7 +438,6 @@ void fetSetBaseTime(int32_t period) {
 void fetInit(void) {
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_OCInitTypeDef  TIM_OCInitStructure;
-    //NVIC_InitTypeDef NVIC_InitStructure;
 
     fetSetConstants();
 

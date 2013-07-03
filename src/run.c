@@ -286,7 +286,7 @@ void runRpmPIDReset(void) {
 
 int32_t runRpmPID(float rpm, float target) {
     float error;
-    float ff, rpmP;//, rpmD;
+    float ff, rpmP;
     float iTerm = rpmI;
     float output;
 
@@ -405,7 +405,6 @@ float currentIState;
 int32_t runCurrentPID(int32_t duty) {
     float error;
     float pTerm, iTerm;
-    //float out;
 
     error = avgAmps - p[MAX_CURRENT];
 

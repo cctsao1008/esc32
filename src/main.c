@@ -40,8 +40,12 @@ char buf[64];
 
 int main(void) {
     statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
-	errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
-	
+    errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
+#ifdef ESC_DEBUG
+    tp = digitalInit(GPIO_TP_PORT, GPIO_TP_PIN);
+    digitalLo(tp);
+#endif
+
     rccInit();
     timerInit();
     configInit();
@@ -66,14 +70,8 @@ int main(void) {
 
     pwmInit();
 
-    //statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
     digitalHi(statusLed);
-    //errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
     digitalHi(errorLed);
-#ifdef ESC_DEBUG
-    tp = digitalInit(GPIO_TP_PORT, GPIO_TP_PIN);
-    digitalLo(tp);
-#endif
 
     // self calibrating idle timer loop
     {
@@ -85,7 +83,7 @@ int main(void) {
         *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
         *DWT_CONTROL = *DWT_CONTROL | 1;	// enable the counter
 
-        minCycles = 0xffff;
+	minCycles = 0xffff;
         while (1) {
             idleCounter++;
 

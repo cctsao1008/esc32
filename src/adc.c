@@ -79,7 +79,6 @@ void adcInit(void) {
     ADC_InitTypeDef ADC_InitStructure;
     DMA_InitTypeDef DMA_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
-    //int i;
 
     adcSetConstants();
     histSize = ADC_HIST_SIZE;
@@ -251,8 +250,7 @@ void adcEvaluateHistSize(void) {
 #pragma GCC optimize ("-O1")
 void DMA1_Channel1_IRQHandler(void) {
     register uint16_t *raw = (uint16_t *)adcRawData;
-    register uint32_t valA, valB, valC; //, valCOMP;
-    //int ampsFlag = 0;
+    register uint32_t valA, valB, valC;
     uint32_t currentMicros;
 
     __asm volatile ("cpsid i");
