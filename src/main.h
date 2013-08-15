@@ -23,7 +23,7 @@
 
 #include "digital.h"
 
-//#define ESC_DEBUG				// uncomment to include debugging code
+#define ESC_DEBUG				// uncomment to include debugging code
 
 #define GPIO_ERROR_LED_PORT	GPIOB
 #define GPIO_ERROR_LED_PIN	GPIO_Pin_4

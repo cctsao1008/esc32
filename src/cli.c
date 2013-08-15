@@ -366,7 +366,6 @@ void cliPrintParam(int i) {
 
 void cliFuncSet(void *cmd, char *cmdLine) {
     char param[32];
-    //const char *format = "%-20s = ";
     float value;
     int i;
 
@@ -524,9 +523,6 @@ void cliPrompt(void) {
 
 void cliCheck(void) {
     cliCommand_t *cmd = NULL;
-
-//    sprintf(tempBuf, "%f\r\n", rpm);
-//    serialPrint(tempBuf);
 
     if (cliTelemetry && !(runMilis % cliTelemetry)) {
 	serialPrint(cliHome);
