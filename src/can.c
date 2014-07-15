@@ -23,6 +23,7 @@
 #include "pwm.h"
 #include "fet.h"
 #include "misc.h"
+#include "xxhash.h"
 
 canDataStruct_t canData;
 
@@ -98,7 +99,7 @@ static inline void canSetParam(canPacket_t *pkt) {
 static inline void canSendGetAddr(void) {
     uint8_t d[8];
 
-    *((uint32_t *)&d[0]) = CAN_UUID;
+    *((uint32_t *)&d[0]) = canData.uuid;
 
     d[4] = CAN_TYPE_ESC;
     d[5] = escId;
@@ -128,7 +129,7 @@ static inline void canProcessAddr(canPacket_t *pkt) {
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
 
     // our UUID?
-    if (*((uint32_t *)&pkt->data[0]) == CAN_UUID) {
+    if (*((uint32_t *)&pkt->data[0]) == canData.uuid) {
     canData.networkId = pkt->tid;
 
     // set filter such that we only get messages destined for our TID
@@ -292,6 +293,7 @@ static inline void canProcessGet(canPacket_t *pkt) {
     while (*p2)
         *p1++ = *p2++;
 
+    *p1 = 0;
     canReply(pkt, 8);
     break;
 
