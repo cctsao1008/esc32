@@ -61,7 +61,7 @@ int32_t fetPeriod;
 int32_t fetActualDutyCycle;
 volatile int32_t fetDutyCycle;
 volatile uint8_t fetStep;
-volatile uint8_t fetNextStep;
+volatile int8_t fetNextStep;
 volatile uint32_t fetGoodDetects;
 volatile uint32_t fetBadDetects;
 volatile uint32_t fetTotalBadDetects;
@@ -69,7 +69,7 @@ volatile uint32_t fetCommutationMicros;
 int8_t fetBrakingEnabled;
 int8_t fetBraking;
 int16_t startSeqCnt;
-int8_t  startSeqStp;
+int8_t fetStepDir;
 float fetServoAngle;
 float fetServoMaxRate;
 
@@ -386,6 +386,18 @@ void fetSetDutyCycle(int32_t requestedDutyCycle) {
     fetDutyCycle = requestedDutyCycle;
 }
 
+static inline int8_t fetGetNextStep(int8_t step) {
+    int8_t nextStep;
+
+    nextStep = step + fetStepDir;
+    if (nextStep > 6)
+	nextStep = 1;
+    else if (nextStep < 1)
+	nextStep = 6;
+
+    return nextStep;
+}
+
 //
 // Low side FET switching is done via direct GPIO manipulation
 // High side FET switching is accomplished by enabling or disabling
@@ -397,9 +409,7 @@ void fetSetStep(int n) {
     fetCommutationMicros = timerGetMicros();
     __asm volatile ("cpsie i");
 
-    fetNextStep = n + 1;
-    if (fetNextStep > 6)
-	fetNextStep = 1;
+    fetNextStep = fetGetNextStep(n);
 
     // set high side
     *AH_BITBAND = AH[n];
@@ -578,28 +588,30 @@ void fetMissedCommutate(int period) {
 }
 
 void fetCommutate(int period) {
-    // keep count of in order ZC detections
-    if (fetStep == fetNextStep) {
-	timerCancelAlarm2();
+    if (state != ESC_STATE_NOCOMM) {
+	// keep count of in order ZC detections
+	if (fetStep == fetNextStep) {
+	    timerCancelAlarm2();
 
-	// commutate
-	fetSetStep(fetStep);
+	    // commutate
+	    fetSetStep(fetStep);
 
-	fetGoodDetects++;
-	if (fetGoodDetects >= 6)
-	    fetBadDetects = 0;
+	    fetGoodDetects++;
+	    if (fetGoodDetects >= 6)
+		fetBadDetects = 0;
 
-	// in case of missed zc
-	if (state == ESC_STATE_RUNNING)
-	    timerSetAlarm2(period + period/2, fetMissedCommutate, period);
-	else if (state == ESC_STATE_STARTING)
-//	    timerSetAlarm2(period*2, fetMissedCommutate, period*2);
-	    timerSetAlarm2(period + period/2, fetMissedCommutate, period);
-    }
-    else {
-	fetBadDetects++;
-	fetTotalBadDetects++;
-	fetGoodDetects = 0;
+	    // in case of missed zc
+	    if (state == ESC_STATE_RUNNING)
+		timerSetAlarm2(period + period/2, fetMissedCommutate, period);
+	    else if (state == ESC_STATE_STARTING)
+//		timerSetAlarm2(period*2, fetMissedCommutate, period*2);
+		timerSetAlarm2(period + period/2, fetMissedCommutate, period);
+	}
+	else {
+	    fetBadDetects++;
+	    fetTotalBadDetects++;
+	    fetGoodDetects = 0;
+	}
     }
 }
 
@@ -607,11 +619,10 @@ void fetCommutate(int period) {
 void motorStartSeqInit(void) {
     // set globals to start position
     startSeqCnt = 0;
-    startSeqStp = fetNextStep;
 
     // set first step
     fetSetBraking(0);
-    fetSetStep(startSeqStp);
+    fetSetStep(fetNextStep);
 
     // Start sequence will run Without commutation.
     state = ESC_STATE_NOCOMM;
@@ -649,20 +660,17 @@ void motorStartSeq(int period) {
 	_fetSetDutyCycle(fetDutyCycle);
 
 	// Prepare next function call
-	period     = 1000; // 1 ms
-	nextPeriod = 1000;
+	period     = 1000 * TIMER_MULT; // 1 ms
+	nextPeriod = 1000 * TIMER_MULT;
 	timerSetAlarm2(period, motorStartSeq, nextPeriod);
     }
     // Rotating field with optional acceleration but without commutation.
     else if (startSeqCnt < (p[START_ALIGN_TIME] + p[START_STEPS_NUM])) {
 	// One time if entering "Rotating field"
 	if (startSeqCnt == p[START_ALIGN_TIME])
-	    period = p[START_STEPS_PERIOD];
+	    period = p[MAX_PERIOD] * TIMER_MULT;
 
-	// Set next step
-	startSeqStp++;
-	if (startSeqStp > 6) startSeqStp = 1;
-	    fetSetStep(startSeqStp);
+	fetSetStep(fetNextStep);
 
 	// Set PWM
 	fetStartDuty = p[START_VOLTAGE] / avgVolts * fetPeriod;
@@ -670,23 +678,36 @@ void motorStartSeq(int period) {
 	_fetSetDutyCycle(fetDutyCycle);
 
 	// Prepare next function call
-	nextPeriod = period - p[START_STEPS_ACCEL];
-	if (nextPeriod < p[MIN_PERIOD])
-	    nextPeriod = p[MIN_PERIOD]; // avoid negative period
+	nextPeriod = period - (p[START_STEPS_ACCEL] * TIMER_MULT);
+	if (nextPeriod < p[START_STEPS_PERIOD] * TIMER_MULT)
+		nextPeriod = crossingPeriod;
+
 	timerSetAlarm2(period, motorStartSeq, nextPeriod);
     }
-    // Continue normal startup with commutation
     else {
-	// allow commutation
-	state = ESC_STATE_STARTING;
+	// let motor run
+	if (p[START_STEPS_NUM]) {
+	    adcMaxAmps = 0;
+	    fetGoodDetects = 0;
+	    fetBadDetects = 0;
+	    fetTotalBadDetects = 0;
 
-	// Count next step (for commutation)
-	startSeqStp++;
-	if (startSeqStp > 6)
-	    startSeqStp = 1;
+	    // last one
+	    fetSetStep(fetNextStep);
 
-	// start
-	fetStartCommutation(startSeqStp);
+	    // cancel any existing ZC detection
+	    timerCancelAlarm1();
+
+	    // allow normal commutation
+	    state = ESC_STATE_STARTING;
+	}
+	// Continue normal startup with commutation
+	else {
+	    // allow normal commutation
+	    state = ESC_STATE_STARTING;
+
+	    fetStartCommutation(fetNextStep);
+	}
     }
 
     // count up step of startup sequence
@@ -780,7 +801,12 @@ void fetSetConstants(void) {
     fetStartDetects = startDetects;
     fetDisarmDetects = disarmDetects;
     fetBrakingEnabled = (int8_t)fetBraking;
-    fetServoMaxRate = servoMaxRate / 1000.0f * p[MOTOR_POLES] * 0.5f;
+    fetServoMaxRate = servoMaxRate / RUN_FREQ * p[MOTOR_POLES] * 0.5f;
+
+    if (p[DIRECTION] >= 0)
+	fetStepDir = 1;
+    else
+	fetStepDir = -1;
 
     p[SWITCH_FREQ] = switchFreq;
     p[START_VOLTAGE] = startVoltage;
@@ -788,6 +814,7 @@ void fetSetConstants(void) {
     p[BAD_DETECTS_DISARM] = disarmDetects;
     p[FET_BRAKING] = fetBraking;
     p[SERVO_MAX_RATE] = servoMaxRate;
+    p[DIRECTION] = fetStepDir;
 
     fetCreateSine();
 }

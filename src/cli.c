@@ -27,6 +27,7 @@
 #include "config.h"
 #include "rcc.h"
 #include "timer.h"
+#include "can.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -463,6 +464,8 @@ void cliFuncStatus(void *cmd, char *cmdLine) {
 #ifdef ESC_DEBUG
     sprintf(tempBuf, formatInt, "DISARM CODE", disarmReason);
     serialPrint(tempBuf);
+    sprintf(tempBuf, formatInt, "CAN NET ID", canData.networkId);
+    serialPrint(tempBuf);
 #endif
 }
 
@@ -488,7 +491,7 @@ void cliFuncTelemetry(void *cmd, char *cmdLine) {
     }
     else {
 	if (freq > 0) {
-	    cliTelemetry = 1000/freq;
+	    cliTelemetry = RUN_FREQ/freq;
 	    serialPrint(cliHome);
 	    serialPrint(cliClear);
 	    serialWrite('\n');
@@ -510,9 +513,23 @@ int cliCommandComp(const void *c1, const void *c2) {
 }
 
 cliCommand_t *cliCommandGet(char *name) {
-    cliCommand_t target = {name, NULL};
+    cliCommand_t target = {name, NULL, NULL};
 
     return bsearch(&target, cliCommandTable, CLI_N_CMDS, sizeof cliCommandTable[0], cliCommandComp);
+}
+
+char *cliTabComplete(char *name, int len) {
+    int i;
+
+    for (i = 0; i < CLI_N_CMDS; i++)
+	if (!strncasecmp(name, cliCommandTable[i].name, len)){
+	    if (i+1 < CLI_N_CMDS && !strncasecmp(name, cliCommandTable[i+1].name, len))
+		return 0;
+	    else
+		return cliCommandTable[i].name;
+	}
+
+    return 0;
 }
 
 void cliPrompt(void) {
@@ -524,9 +541,11 @@ void cliPrompt(void) {
 void cliCheck(void) {
     cliCommand_t *cmd = NULL;
 
-    if (cliTelemetry && !(runMilis % cliTelemetry)) {
+    if (cliTelemetry && !(runCount % cliTelemetry)) {
+	maxAmps = (adcMaxAmps - adcAmpsOffset) * adcToAmps;
+
 	serialPrint(cliHome);
-	sprintf(tempBuf, "Telemetry @ %d Hz\r\n\n", 1000/cliTelemetry);
+	sprintf(tempBuf, "Telemetry @ %d Hz\r\n\n", RUN_FREQ/cliTelemetry);
 	serialPrint(tempBuf);
 	cliFuncStatus(cmd, "");
 	serialPrint("\n> ");
@@ -548,7 +567,7 @@ void cliCheck(void) {
 	    if (cliBufIndex > 1) {
 		serialPrint("\r\n");
 		serialPrint(cliClearEOS);
-		cliBuf[cliBufIndex] = 0;
+		cliBuf[cliBufIndex-1] = 0;
 
 		cmd = cliCommandGet(cliBuf);
 
@@ -564,6 +583,21 @@ void cliCheck(void) {
 	    }
 
 	    cliPrompt();
+	}
+	// tab completion
+	else if (c == CLI_TAB) {
+	    char *ret;
+
+	    cliBuf[--cliBufIndex] = 0;
+	    ret = cliTabComplete(cliBuf, cliBufIndex);
+	    if (ret) {
+		cliBufIndex = strlen(ret);
+		memcpy(cliBuf, ret, cliBufIndex);
+		cliBuf[cliBufIndex++] = ' ';
+		serialPrint("\r> ");
+		serialPrint(cliBuf);
+		serialPrint(cliClearEOL);
+	    }
 	}
 	// interrupt
 	else if (c == CLI_INTR) {
