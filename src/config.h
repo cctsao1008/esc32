@@ -19,70 +19,70 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#define DEFAULT_CONFIG_VERSION		2.01f
-#define DEFAULT_STARTUP_MODE		0.0f
-#define DEFAULT_BAUD_RATE		230400
-#define DEFAULT_ESC_ID			0
+#define DEFAULT_CONFIG_VERSION      2.01f
+#define DEFAULT_STARTUP_MODE        0.0f
+#define DEFAULT_BAUD_RATE           230400
+#define DEFAULT_ESC_ID              0
 
-#define DEFAULT_PTERM			0.25f
-#define DEFAULT_PNFAC			10.0f
-#define DEFAULT_ITERM			0.0006f
-#define DEFAULT_INFAC			0.15f
+#define DEFAULT_PTERM               0.25f
+#define DEFAULT_PNFAC               10.0f
+#define DEFAULT_ITERM               0.0006f
+#define DEFAULT_INFAC               0.15f
 
-#define DEFAULT_FF1TERM			0.0f
-#define DEFAULT_FF2TERM			0.0f
+#define DEFAULT_FF1TERM             0.0f
+#define DEFAULT_FF2TERM             0.0f
 
-#define DEFAULT_CL1TERM			0.0f
-#define DEFAULT_CL2TERM			0.0f
-#define DEFAULT_CL3TERM			0.0f
-#define DEFAULT_CL4TERM			0.0f
-#define DEFAULT_CL5TERM			0.0f
+#define DEFAULT_CL1TERM             0.0f
+#define DEFAULT_CL2TERM             0.0f
+#define DEFAULT_CL3TERM             0.0f
+#define DEFAULT_CL4TERM             0.0f
+#define DEFAULT_CL5TERM             0.0f
 
-#define DEFAULT_THR1TERM		0.0f
-#define DEFAULT_THR2TERM		1.0f
+#define DEFAULT_THR1TERM            0.0f
+#define DEFAULT_THR2TERM            1.0f
 
-#define DEFAULT_SHUNT_RESISTANCE	0.5f	    // milli Ohms
-#define DEFAULT_MIN_PERIOD		50.0f	    // us
-#define DEFAULT_MAX_PERIOD		12000.0f    // us
-#define DEFAULT_BLANKING_MICROS		30.0f	    // us
-#define DEFAULT_ADVANCE			10.0f	    // electrical degrees
-#define DEFAULT_START_VOLTAGE		1.1f	    // voltage used to start motor
-#define DEFAULT_START_ALIGN_TIME	600	    // ms to align rotor in known position
-#define DEFAULT_START_ALIGN_VOLTAGE	0.9f	    // max voltage during align (around 0.8 * START_VOLTAGE)
-#define DEFAULT_START_STEPS_NUM		0.0f	    // steps without commutation
-#define DEFAULT_START_STEPS_PERIOD	16000	    // us betweet steps
-#define DEFAULT_START_STEPS_ACCEL	0.0f	    // us each following step will be shorter (acceleration)
-#define DEFAULT_GOOD_DETECTS_START	75.0f	    // after which will go into RUNNING mode
-#define DEFAULT_BAD_DETECTS_DISARM	48.0f	    // after which will go into DISARMED mode
-#define DEFAULT_MAX_CURRENT		20.0f	    // amps
-#define DEFAULT_SWITCH_FREQ		20.0f	    // output PWM frequency in KHz
-#define DEFAULT_MOTOR_POLES		14.0f
+#define DEFAULT_SHUNT_RESISTANCE    0.5f        // milli Ohms
+#define DEFAULT_MIN_PERIOD          50.0f       // us
+#define DEFAULT_MAX_PERIOD          12000.0f    // us
+#define DEFAULT_BLANKING_MICROS     30.0f       // us
+#define DEFAULT_ADVANCE             10.0f       // electrical degrees
+#define DEFAULT_START_VOLTAGE       1.1f        // voltage used to start motor
+#define DEFAULT_START_ALIGN_TIME    600     // ms to align rotor in known position
+#define DEFAULT_START_ALIGN_VOLTAGE 0.9f        // max voltage during align (around 0.8 * START_VOLTAGE)
+#define DEFAULT_START_STEPS_NUM     0.0f        // steps without commutation
+#define DEFAULT_START_STEPS_PERIOD  16000       // us betweet steps
+#define DEFAULT_START_STEPS_ACCEL   0.0f        // us each following step will be shorter (acceleration)
+#define DEFAULT_GOOD_DETECTS_START  75.0f       // after which will go into RUNNING mode
+#define DEFAULT_BAD_DETECTS_DISARM  48.0f       // after which will go into DISARMED mode
+#define DEFAULT_MAX_CURRENT         20.0f       // amps
+#define DEFAULT_SWITCH_FREQ         20.0f       // output PWM frequency in KHz
+#define DEFAULT_MOTOR_POLES         14.0f
 
-#define DEFAULT_PWM_MIN_PERIOD		2200	    // minimum valid period
-#define DEFAULT_PWM_MAX_PERIOD		25000	    // maximum valid period
+#define DEFAULT_PWM_MIN_PERIOD      2200        // minimum valid period
+#define DEFAULT_PWM_MAX_PERIOD      25000       // maximum valid period
 
-#define DEFAULT_PWM_MIN_VALUE		750	    // minimum to consider pulse a valid signal
-#define DEFAULT_PWM_LO_VALUE		1000	    // lowest running value
-#define DEFAULT_PWM_HI_VALUE		1950	    // highest running value
-#define DEFAULT_PWM_MAX_VALUE		2250	    // maximum to consider pulse a valid signal
-#define DEFAULT_PWM_MIN_START		1100	    // minimum value required to start
+#define DEFAULT_PWM_MIN_VALUE       750     // minimum to consider pulse a valid signal
+#define DEFAULT_PWM_LO_VALUE        1000        // lowest running value
+#define DEFAULT_PWM_HI_VALUE        1950        // highest running value
+#define DEFAULT_PWM_MAX_VALUE       2250        // maximum to consider pulse a valid signal
+#define DEFAULT_PWM_MIN_START       1100        // minimum value required to start
 
-#define DEFAULT_PWM_LOWPASS		0.0f	    // lowpass on PWM input values (0 = none, 10 = heavy, no upper limit)
-#define DEFAULT_RPM_MEAS_LP		0.5f	    // lowpass measured RPM values for closed loop control (0 = none, 0.99 = max, >=1 not allowed)
+#define DEFAULT_PWM_LOWPASS         0.0f        // lowpass on PWM input values (0 = none, 10 = heavy, no upper limit)
+#define DEFAULT_RPM_MEAS_LP         0.5f        // lowpass measured RPM values for closed loop control (0 = none, 0.99 = max, >=1 not allowed)
 
-#define DEFAULT_PWM_RPM_SCALE		6500	    // RPM equivalent of maximum PWM IN in CLOSED_LOOP mode
+#define DEFAULT_PWM_RPM_SCALE       6500        // RPM equivalent of maximum PWM IN in CLOSED_LOOP mode
 
-#define DEFAULT_FET_BRAKING		0
+#define DEFAULT_FET_BRAKING         0
 
-#define DEFAULT_SERVO_DUTY		16.0f	    // %
-#define DEFAULT_SERVO_P			0.05f
-#define DEFAULT_SERVO_D			0.0f
-#define DEFAULT_SERVO_MAX_RATE		1000.0f	    // deg/s
-#define DEFAULT_SERVO_SCALE		360.0f	    // deg
-#define DEFAULT_DIRECTION		1.0f	    // 1 == forward, -1 == reverse
+#define DEFAULT_SERVO_DUTY          16.0f       // %
+#define DEFAULT_SERVO_P             0.05f
+#define DEFAULT_SERVO_D             0.0f
+#define DEFAULT_SERVO_MAX_RATE      1000.0f     // deg/s
+#define DEFAULT_SERVO_SCALE         360.0f      // deg
+#define DEFAULT_DIRECTION           1.0f        // 1 == forward, -1 == reverse
 
-#define FLASH_PAGE_SIZE			((uint16_t)0x400)
-#define FLASH_WRITE_ADDR		(0x08000000 + (uint32_t)FLASH_PAGE_SIZE * 63)    // use the last KB for storage
+#define FLASH_PAGE_SIZE             ((uint16_t)0x400)
+#define FLASH_WRITE_ADDR            (0x08000000 + (uint32_t)FLASH_PAGE_SIZE * 63)    // use the last KB for storage
 
 enum configParameters {
     CONFIG_VERSION = 0,

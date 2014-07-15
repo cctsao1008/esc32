@@ -39,16 +39,16 @@ uint8_t owCRC(uint8_t inData, uint8_t seed) {
     uint8_t temp;
 
     for (bitsLeft = 8; bitsLeft > 0; bitsLeft--) {
-	temp = ((seed ^ inData) & 0x01);
-	if (temp == 0) {
-	    seed >>= 1;
-	}
-	else {
-	    seed ^= 0x18;
-	    seed >>= 1;
-	    seed |= 0x80;
-	}
-	inData >>= 1;
+    temp = ((seed ^ inData) & 0x01);
+    if (temp == 0) {
+        seed >>= 1;
+    }
+    else {
+        seed ^= 0x18;
+        seed >>= 1;
+        seed |= 0x80;
+    }
+    inData >>= 1;
     }
 
     return seed;
@@ -59,11 +59,11 @@ void owInit(void) {
 
     owROMCode[0] = 0xAA;
     for (i = 0; i < 6; i++)
-	owROMCode[i+1] = *(((uint8_t *)(OW_UID_ADDRESS))+i);
+    owROMCode[i+1] = *(((uint8_t *)(OW_UID_ADDRESS))+i);
 
     owROMCode[7] = 0x00;
     for (i = 0; i < 7; i++)
-	owROMCode[7] = owCRC(owROMCode[i], owROMCode[7]);
+    owROMCode[7] = owCRC(owROMCode[i], owROMCode[7]);
 }
 
 void owPullLow(void) {
@@ -106,149 +106,149 @@ void owReadComplete(void) {
     uint8_t *pointer;
 
     switch (owBuf[0]) {
-	case OW_ROM_MATCH:
-	    if (owLastCommand != owBuf[0]) {
-		owLastCommand = owBuf[0];
-		// read an additional 8 bytes
-		owBufPointer = &owBuf[1];
-		owReadBytes(8);
-	    }
-	    else {
-		owLastCommand = 0x00;
-		// does the ROM code match ours?
-		if (!memcmp(&owBuf[1], owROMCode, 8)) {
-		    // prepare to read next command
-		    owBufPointer = owBuf;
-		    owReadBytes(1);
-		}
-		else {
-		    // terminate transaction
-		    owTimeoutIsr(0);
-		}
-	    }
-	    break;
+    case OW_ROM_MATCH:
+        if (owLastCommand != owBuf[0]) {
+        owLastCommand = owBuf[0];
+        // read an additional 8 bytes
+        owBufPointer = &owBuf[1];
+        owReadBytes(8);
+        }
+        else {
+        owLastCommand = 0x00;
+        // does the ROM code match ours?
+        if (!memcmp(&owBuf[1], owROMCode, 8)) {
+            // prepare to read next command
+            owBufPointer = owBuf;
+            owReadBytes(1);
+        }
+        else {
+            // terminate transaction
+            owTimeoutIsr(0);
+        }
+        }
+        break;
 
-	case OW_ROM_SKIP:
-	    // prepare to read next command
-	    owBufPointer = owBuf;
-	    owReadBytes(1);
-	break;
+    case OW_ROM_SKIP:
+        // prepare to read next command
+        owBufPointer = owBuf;
+        owReadBytes(1);
+    break;
 
-	case OW_ROM_READ:
-	    // prepare to write out ROM CODE (8 bytes)
-	    owState = OW_WRITE;
-	    owBufPointer = owROMCode;
-	    owWriteBytes(8);
-	break;
+    case OW_ROM_READ:
+        // prepare to write out ROM CODE (8 bytes)
+        owState = OW_WRITE;
+        owBufPointer = owROMCode;
+        owWriteBytes(8);
+    break;
 
-	case OW_VERSION:
-	    owState = OW_WRITE;
-	    owBufPointer = (uint8_t *)version;
-	    owWriteBytes(sizeof(version));
-	break;
+    case OW_VERSION:
+        owState = OW_WRITE;
+        owBufPointer = (uint8_t *)version;
+        owWriteBytes(sizeof(version));
+    break;
 
-	case OW_PARAM_READ:
-	    if (owLastCommand != owBuf[0]) {
-		owLastCommand = owBuf[0];
-		// read an additional 1 bytes
-		owBufPointer = &owBuf[1];
-		owReadBytes(1);
-	    }
-	    else {
-		owLastCommand = 0x00;
-		if (owBuf[1] < CONFIG_NUM_PARAMS) {
-		    // copy config value into send buffer
-		    pointer = (uint8_t *)&(p[owBuf[1]]);
-		    owBuf[2] = pointer[0];
-		    owBuf[3] = pointer[1];
-		    owBuf[4] = pointer[2];
-		    owBuf[5] = pointer[3];
+    case OW_PARAM_READ:
+        if (owLastCommand != owBuf[0]) {
+        owLastCommand = owBuf[0];
+        // read an additional 1 bytes
+        owBufPointer = &owBuf[1];
+        owReadBytes(1);
+        }
+        else {
+        owLastCommand = 0x00;
+        if (owBuf[1] < CONFIG_NUM_PARAMS) {
+            // copy config value into send buffer
+            pointer = (uint8_t *)&(p[owBuf[1]]);
+            owBuf[2] = pointer[0];
+            owBuf[3] = pointer[1];
+            owBuf[4] = pointer[2];
+            owBuf[5] = pointer[3];
 
-		    owState = OW_WRITE;
-		    owBufPointer = owBuf;
-		    owWriteBytes(6);
-		}
-	    }
-	break;
+            owState = OW_WRITE;
+            owBufPointer = owBuf;
+            owWriteBytes(6);
+        }
+        }
+    break;
 
-	case OW_PARAM_WRITE:
-	    if (owLastCommand != owBuf[0]) {
-		owLastCommand = owBuf[0];
-		// read an additional 5 bytes
-		owBufPointer = &owBuf[1];
-		owReadBytes(5);
-	    }
-	    else {
-		owLastCommand = 0x00;
-		if (owBuf[1] < CONFIG_NUM_PARAMS) {
-		    // set parameter
-		    configSetParamByID(owBuf[1], (float)owBuf[2]);
+    case OW_PARAM_WRITE:
+        if (owLastCommand != owBuf[0]) {
+        owLastCommand = owBuf[0];
+        // read an additional 5 bytes
+        owBufPointer = &owBuf[1];
+        owReadBytes(5);
+        }
+        else {
+        owLastCommand = 0x00;
+        if (owBuf[1] < CONFIG_NUM_PARAMS) {
+            // set parameter
+            configSetParamByID(owBuf[1], (float)owBuf[2]);
 
-		    // copy config value into send buffer
-		    pointer = (uint8_t *)&(p[owBuf[1]]);
-		    owBuf[2] = pointer[0];
-		    owBuf[3] = pointer[1];
-		    owBuf[4] = pointer[2];
-		    owBuf[5] = pointer[3];
+            // copy config value into send buffer
+            pointer = (uint8_t *)&(p[owBuf[1]]);
+            owBuf[2] = pointer[0];
+            owBuf[3] = pointer[1];
+            owBuf[4] = pointer[2];
+            owBuf[5] = pointer[3];
 
-		    owState = OW_WRITE;
-		    owBufPointer = owBuf;
-		    owWriteBytes(6);
-		}
-	}
-	break;
+            owState = OW_WRITE;
+            owBufPointer = owBuf;
+            owWriteBytes(6);
+        }
+    }
+    break;
 
-	case OW_CONFIG_READ:
-	    configReadFlash();
+    case OW_CONFIG_READ:
+        configReadFlash();
 
-	    // return command ack
-	    owState = OW_WRITE;
-	    owBufPointer = owBuf;
-	    owWriteBytes(1);
-	break;
+        // return command ack
+        owState = OW_WRITE;
+        owBufPointer = owBuf;
+        owWriteBytes(1);
+    break;
 
-	// required 30ms to complete
-	case OW_CONFIG_WRITE:
-	    configWriteFlash();
-	break;
+    // required 30ms to complete
+    case OW_CONFIG_WRITE:
+        configWriteFlash();
+    break;
 
-	case OW_CONFIG_DEFAULT:
-	    configLoadDefault();
+    case OW_CONFIG_DEFAULT:
+        configLoadDefault();
 
-	    // return command ack
-	    owState = OW_WRITE;
-	    owBufPointer = owBuf;
-	    owWriteBytes(1);
-	break;
+        // return command ack
+        owState = OW_WRITE;
+        owBufPointer = owBuf;
+        owWriteBytes(1);
+    break;
 
-	case OW_GET_MODE:
-	    owBuf[0] = OW_GET_MODE;
-	    owBuf[1] = runMode;
-	    
-	    owState = OW_WRITE;
-	    owBufPointer = owBuf;
-	    owWriteBytes(2);
-	break;
-	
-	case OW_SET_MODE:
-	    if (owLastCommand != owBuf[0]) {
-		owLastCommand = owBuf[0];
-		// read an additional 1 byte
-		owBufPointer = &owBuf[1];
-		owReadBytes(1);
-	    }
-	    else {
-		owLastCommand = 0x00;
-		if (owBuf[1] >= 0 && owBuf[1] < NUM_RUN_MODES) {
-		    runMode = owBuf[1];
+    case OW_GET_MODE:
+        owBuf[0] = OW_GET_MODE;
+        owBuf[1] = runMode;
+        
+        owState = OW_WRITE;
+        owBufPointer = owBuf;
+        owWriteBytes(2);
+    break;
+    
+    case OW_SET_MODE:
+        if (owLastCommand != owBuf[0]) {
+        owLastCommand = owBuf[0];
+        // read an additional 1 byte
+        owBufPointer = &owBuf[1];
+        owReadBytes(1);
+        }
+        else {
+        owLastCommand = 0x00;
+        if (owBuf[1] >= 0 && owBuf[1] < NUM_RUN_MODES) {
+            runMode = owBuf[1];
 
-		    owState = OW_WRITE;
-		    owBufPointer = owBuf;
-		    owWriteBytes(2);
-		}
-	    }
-	    ;
-	break;
+            owState = OW_WRITE;
+            owBufPointer = owBuf;
+            owWriteBytes(2);
+        }
+        }
+        ;
+    break;
     }
 }
 
@@ -263,9 +263,9 @@ void owByteReceived(void) {
     owTimeout(300);
 
     if (--owReadNum > 0)
-	owReadBytes(owReadNum);
+    owReadBytes(owReadNum);
     else
-	owReadComplete();
+    owReadComplete();
 }
 
 void owByteSent(void) {
@@ -274,59 +274,59 @@ void owByteSent(void) {
     owTimeout(300);
 
     if (--owWriteNum > 0)
-	owWriteBytes(owWriteNum);
+    owWriteBytes(owWriteNum);
     else
-	owWriteComplete();
+    owWriteComplete();
 }
 
 void owEdgeDetect(uint8_t edge) {
     if (edge == 0) {
-	switch (owState) {
-	    case OW_READ:
-		// read bit in 15us
-		pwmIsrAllOff();
-		owRelease();
-		timerSetAlarm3(15*TIMER_MULT, owReadBitIsr, 0);
-	    break;
+    switch (owState) {
+        case OW_READ:
+        // read bit in 15us
+        pwmIsrAllOff();
+        owRelease();
+        timerSetAlarm3(15*TIMER_MULT, owReadBitIsr, 0);
+        break;
 
-	    case OW_WRITE:
-		// write bit
-		owRelease();
-		owWriteBitIsr(0);
-	    break;
-	}
+        case OW_WRITE:
+        // write bit
+        owRelease();
+        owWriteBitIsr(0);
+        break;
+    }
     }
 }
 
 void owResetIsr(int state) {
     switch (state) {
-	case OW_RESET_STATE_0:
-	    // wait 15us
-	    timerSetAlarm3(15*TIMER_MULT, owResetIsr, OW_RESET_STATE_1);
-	break;
+    case OW_RESET_STATE_0:
+        // wait 15us
+        timerSetAlarm3(15*TIMER_MULT, owResetIsr, OW_RESET_STATE_1);
+    break;
 
-	case OW_RESET_STATE_1:
-	    // signal presence for 70us
-	    owPullLow();
-	    timerSetAlarm3(70*TIMER_MULT, owResetIsr, OW_RESET_STATE_2);
-	break;
+    case OW_RESET_STATE_1:
+        // signal presence for 70us
+        owPullLow();
+        timerSetAlarm3(70*TIMER_MULT, owResetIsr, OW_RESET_STATE_2);
+    break;
 
-	case OW_RESET_STATE_2:
-	    // release bus and wait for byte
-	    owRelease();
+    case OW_RESET_STATE_2:
+        // release bus and wait for byte
+        owRelease();
 
-	    // light status LED
-	    digitalLo(statusLed);
+        // light status LED
+        digitalLo(statusLed);
 
-	    // prepare to read a byte
-	    owState = OW_READ;
-	    owBufPointer = owBuf;
-	    owLastCommand = 0x00;
-	    owReadBytes(1);
+        // prepare to read a byte
+        owState = OW_READ;
+        owBufPointer = owBuf;
+        owLastCommand = 0x00;
+        owReadBytes(1);
 
-	    // 15ms timeout
-	    owTimeout(15000);
-	break;
+        // 15ms timeout
+        owTimeout(15000);
+    break;
     }
 }
 
@@ -341,35 +341,35 @@ void owReadBitIsr(int unused) {
 
     // is byte complete?
     if (++owBit > 7)
-	owByteReceived();
+    owByteReceived();
 }
 
 void owWriteBitIsr(int state) {
     // write bit
     if (state == 0) {
-	// only 0 bits need action, 1 bits let the bus rise on its own
-	if (!(owByteValue & (0x01<<owBit++))) {
-	    owPullLow();
-	    // schedule release
-	    timerSetAlarm3(30*TIMER_MULT, owWriteBitIsr, 1);
-	}
-	else {
-	    owTimeout(150);
+    // only 0 bits need action, 1 bits let the bus rise on its own
+    if (!(owByteValue & (0x01<<owBit++))) {
+        owPullLow();
+        // schedule release
+        timerSetAlarm3(30*TIMER_MULT, owWriteBitIsr, 1);
+    }
+    else {
+        owTimeout(150);
 
-	    // finished with this byte
-	    if (owBit > 7)
-		    owByteSent();
-	}
+        // finished with this byte
+        if (owBit > 7)
+            owByteSent();
+    }
     }
     // release bus
     else {
-	owRelease();
+    owRelease();
 
-	owTimeout(150);
+    owTimeout(150);
 
-	// finished with this byte
-	if (owBit > 7)
-		owByteSent();
+    // finished with this byte
+    if (owBit > 7)
+        owByteSent();
     }
 }
 

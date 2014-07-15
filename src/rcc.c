@@ -37,23 +37,23 @@ void rccWriteBkpDr(uint32_t value) {
 void rccBootLoader(void) {
     // check for magic cookie
     if (rccReadBkpDr() == 0xDECEA5ED) {
-	digitalPin *statusLed, *errorLed;
+    digitalPin *statusLed, *errorLed;
 
-	rccWriteBkpDr(0); // reset flag
+    rccWriteBkpDr(0); // reset flag
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
-	statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
-	digitalLo(statusLed);
-	errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
-	digitalLo(errorLed);
+    statusLed = digitalInit(GPIO_STATUS_LED_PORT, GPIO_STATUS_LED_PIN);
+    digitalLo(statusLed);
+    errorLed = digitalInit(GPIO_ERROR_LED_PORT, GPIO_ERROR_LED_PIN);
+    digitalLo(errorLed);
 
-	// jump to boot loader ROM
-	__asm volatile ("LDR     R0, =0x1FFFF000\n"
-			"LDR     SP,[R0, #0]\n"
-			"LDR     R0,[R0, #4]\n"
-			"BX      R0\n");
+    // jump to boot loader ROM
+    __asm volatile ("LDR     R0, =0x1FFFF000\n"
+            "LDR     SP,[R0, #0]\n"
+            "LDR     R0,[R0, #4]\n"
+            "BX      R0\n");
     }
 }
 
@@ -124,5 +124,5 @@ void rccInit(void) {
     // Shutdown HSI clock
     RCC_HSICmd(DISABLE);
     while (RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == SET)
-	;
+    ;
 }

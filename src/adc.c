@@ -65,14 +65,14 @@ void adcCalibrateADC(ADC_TypeDef *ADCx) {
 
     // Check the end of ADC reset calibration register
     while(ADC_GetResetCalibrationStatus(ADCx))
-	;
+    ;
 
     // Start ADC calibration
     ADC_StartCalibration(ADCx);
 
     // Check the end of ADC calibration
     while(ADC_GetCalibrationStatus(ADCx))
-	;
+    ;
 }
 
 void adcInit(void) {
@@ -109,7 +109,7 @@ void adcInit(void) {
 
     // Enable the DMA1_Channel1 global Interrupt
     NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
@@ -125,19 +125,19 @@ void adcInit(void) {
     ADC_Init(ADC1, &ADC_InitStructure);
 
 #ifdef ADC_FAST_SAMPLE
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SAMPLE_TIME);	// SENSE_CURRENT
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 2, ADC_SAMPLE_TIME);	// SENSE_CURRENT
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SAMPLE_TIME);	// SENSE_B
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 4, ADC_SAMPLE_TIME);	// SENSE_B
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 5, ADC_SAMPLE_TIME);	// SENSE_VIN
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 6, ADC_SAMPLE_TIME);	// SENSE_VIN
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 7, ADC_SAMPLE_TIME);	// SENSE_B
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 8, ADC_SAMPLE_TIME);	// SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SAMPLE_TIME);  // SENSE_CURRENT
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 2, ADC_SAMPLE_TIME);  // SENSE_CURRENT
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SAMPLE_TIME);  // SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 4, ADC_SAMPLE_TIME);  // SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 5, ADC_SAMPLE_TIME);  // SENSE_VIN
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 6, ADC_SAMPLE_TIME);  // SENSE_VIN
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 7, ADC_SAMPLE_TIME);  // SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 8, ADC_SAMPLE_TIME);  // SENSE_B
 #else
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SAMPLE_TIME);	// SENSE_CURRENT
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 2, ADC_SAMPLE_TIME);	// SENSE_B
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SAMPLE_TIME);	// SENSE_VIN
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 4, ADC_SAMPLE_TIME);	// SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 1, ADC_SAMPLE_TIME);  // SENSE_CURRENT
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 2, ADC_SAMPLE_TIME);  // SENSE_B
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 3, ADC_SAMPLE_TIME);  // SENSE_VIN
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 4, ADC_SAMPLE_TIME);  // SENSE_B
 #endif
     ADC_DMACmd(ADC1, ENABLE);
 
@@ -152,19 +152,19 @@ void adcInit(void) {
     ADC_Init(ADC2, &ADC_InitStructure);
 
 #ifdef ADC_FAST_SAMPLE
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 2, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 3, ADC_SAMPLE_TIME);	// SENSE_C
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 4, ADC_SAMPLE_TIME);	// SENSE_C
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 5, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 6, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 7, ADC_SAMPLE_TIME);	// SENSE_C
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 8, ADC_SAMPLE_TIME);	// SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 2, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 3, ADC_SAMPLE_TIME);  // SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 4, ADC_SAMPLE_TIME);  // SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 5, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 6, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 7, ADC_SAMPLE_TIME);  // SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 8, ADC_SAMPLE_TIME);  // SENSE_C
 #else
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 2, ADC_SAMPLE_TIME);	// SENSE_C
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 3, ADC_SAMPLE_TIME);	// SENSE_A
-    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 4, ADC_SAMPLE_TIME);	// SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 1, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 2, ADC_SAMPLE_TIME);  // SENSE_C
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_1, 3, ADC_SAMPLE_TIME);  // SENSE_A
+    ADC_RegularChannelConfig(ADC2, ADC_Channel_3, 4, ADC_SAMPLE_TIME);  // SENSE_C
 #endif
 
     ADC_ExternalTrigConvCmd(ADC2, ENABLE);
@@ -197,7 +197,7 @@ void adcSetCrossingPeriod(int32_t crossPer) {
     crossingPeriod = crossPer;
 }
 
-void adcGrowHist(void) {
+static inline void adcGrowHist(void) {
     register int i;
 
     avgA += histA[histIndex];
@@ -205,34 +205,34 @@ void adcGrowHist(void) {
     avgC += histC[histIndex];
 
     for (i = histSize; i > histIndex; i--) {
-	histA[i] = histA[i-1];
-	histB[i] = histB[i-1];
-	histC[i] = histC[i-1];
+    histA[i] = histA[i-1];
+    histB[i] = histB[i-1];
+    histC[i] = histC[i-1];
     }
 
     histSize++;
 }
 
-void adcShrinkHist(void) {
+static inline void adcShrinkHist(void) {
     register int i;
 
     for (i = histIndex; i < histSize-1; i++) {
-	histA[i] = histA[i+1];
-	histB[i] = histB[i+1];
-	histC[i] = histC[i+1];
+    histA[i] = histA[i+1];
+    histB[i] = histB[i+1];
+    histC[i] = histC[i+1];
     }
 
     histSize--;
 
     if (histIndex == histSize)
-	histIndex = 0;
+    histIndex = 0;
 
     avgA -= histA[histIndex];
     avgB -= histB[histIndex];
     avgC -= histC[histIndex];
 }
 
-void adcEvaluateHistSize(void) {
+static inline void adcEvaluateHistSize(void) {
     int16_t sizeNeeded;
 
 //  sizeNeeded = crossingPeriod/16/TIMER_MULT;
@@ -240,11 +240,10 @@ void adcEvaluateHistSize(void) {
 //  sizeNeeded = crossingPeriod/24/TIMER_MULT;
     sizeNeeded = crossingPeriod/32/TIMER_MULT;
 
-//    if (sizeNeeded > (histSize+1) && histSize < ADC_HIST_SIZE)
     if (sizeNeeded > (histSize+1) && histSize < ADC_HIST_SIZE)
-	adcGrowHist();
+    adcGrowHist();
     else if (sizeNeeded < (histSize-1) && sizeNeeded > 1)
-	adcShrinkHist();
+    adcShrinkHist();
 }
 
 #pragma GCC optimize ("-O1")
@@ -260,115 +259,129 @@ void DMA1_Channel1_IRQHandler(void) {
 #ifdef ADC_FAST_SAMPLE
     if ((DMA1->ISR & DMA1_FLAG_TC1) != RESET) {
         raw += (ADC_CHANNELS * 4);        // 4 16bit words each
-	adcAvgVolts -= (adcAvgVolts - (int32_t)((raw[0]+raw[2])<<(ADC_VOLTS_PRECISION-1)))>>6;
+    adcAvgVolts -= (adcAvgVolts - (int32_t)((raw[0]+raw[2])<<(ADC_VOLTS_PRECISION-1)))>>6;
     }
     else {
-	adcAvgAmps -= (adcAvgAmps - (int32_t)((raw[0]+raw[2])<<(ADC_AMPS_PRECISION-1)))>>6;
+    adcAvgAmps -= (adcAvgAmps - (int32_t)((raw[0]+raw[2])<<(ADC_AMPS_PRECISION-1)))>>6;
     }
 #else
     if ((DMA1->ISR & DMA1_FLAG_TC1) != RESET) {
         raw += (ADC_CHANNELS * 2);        // 2 16bit words each
-	adcAvgVolts -= (adcAvgVolts - (int32_t)(raw[0]<<ADC_VOLTS_PRECISION))>>6;
+    adcAvgVolts -= (adcAvgVolts - (int32_t)(raw[0]<<ADC_VOLTS_PRECISION))>>6;
     }
     else {
-	adcAvgAmps -= (adcAvgAmps - (int32_t)(raw[0]<<ADC_AMPS_PRECISION))>>6;
+    adcAvgAmps -= (adcAvgAmps - (int32_t)(raw[0]<<ADC_AMPS_PRECISION))>>6;
     }
 #endif
 
     DMA1->IFCR = DMA1_IT_GL1 | DMA1_IT_TC1 | DMA1_IT_HT1;
 
     if (runMode == SERVO_MODE)
-	return;
+    return;
 
     // blanking time after commutation
     if (!fetCommutationMicros || ((currentMicros >= fetCommutationMicros) ? (currentMicros - fetCommutationMicros) : (TIMER_MASK - fetCommutationMicros + currentMicros)) > adcblankingMicros) {
 #ifdef ADC_FAST_SAMPLE
-	histA[histIndex] = valA = (raw[1]+raw[3]);
-	histB[histIndex] = valB = (raw[4]+raw[6]);
-	histC[histIndex] = valC = (raw[5]+raw[7]);
+    histA[histIndex] = valA = (raw[1]+raw[3]);
+    histB[histIndex] = valB = (raw[4]+raw[6]);
+    histC[histIndex] = valC = (raw[5]+raw[7]);
 #else
-	histA[histIndex] = valA = raw[1];
-	histB[histIndex] = valB = raw[2];
-	histC[histIndex] = valC = raw[3];
+    histA[histIndex] = valA = raw[1];
+    histB[histIndex] = valB = raw[2];
+    histC[histIndex] = valC = raw[3];
 #endif
-	histIndex = (histIndex + 1) % histSize;
+    histIndex = (histIndex + 1) % histSize;
 
-	avgA += valA - histA[histIndex];
-	avgB += valB - histB[histIndex];
-	avgC += valC - histC[histIndex];
+    avgA += valA - histA[histIndex];
+    avgB += valB - histB[histIndex];
+    avgC += valC - histC[histIndex];
 
-	if ((avgA+avgB+avgC)/histSize > (ADC_MIN_COMP*3) && state != ESC_STATE_DISARMED && state != ESC_STATE_NOCOMM) {
-	    register int32_t periodMicros;
+    if ((avgA+avgB+avgC)/histSize > (ADC_MIN_COMP*3) && state != ESC_STATE_DISARMED) {
+        register int32_t periodMicros;
 
-	    periodMicros = (currentMicros >= detectedCrossing) ? (currentMicros - detectedCrossing) : (TIMER_MASK - detectedCrossing + currentMicros);
+        periodMicros = (currentMicros >= detectedCrossing) ? (currentMicros - detectedCrossing) : (TIMER_MASK - detectedCrossing + currentMicros);
 
-	    if (periodMicros > nextCrossingDetect) {
-		register uint8_t nextStep = 0;
+        if (periodMicros > nextCrossingDetect) {
+        register int8_t nextStep = 0;
 
-		if (!adcStateA && avgA >= (avgB+avgC)>>1) {
-		    adcStateA = 1;
-		    nextStep = 6;
-		}
-		else if (adcStateA && avgA <= (avgB+avgC)>>1) {
-		    adcStateA = 0;
-		    nextStep = 3;
-		}
-		else if (!adcStateB && avgB >= (avgA+avgC)>>1) {
-		    adcStateB = 1;
-		    nextStep = 4;
-		}
-		else if (adcStateB && avgB <= (avgA+avgC)>>1) {
-		    adcStateB = 0;
-		    nextStep = 1;
+        if (!adcStateA && avgA >= (avgB+avgC)>>1) {
+            adcStateA = 1;
+            if (fetStepDir > 0)
+            nextStep = 6;
+            else
+            nextStep = 1;
+        }
+        else if (adcStateA && avgA <= (avgB+avgC)>>1) {
+            adcStateA = 0;
+            if (fetStepDir > 0)
+            nextStep = 3;
+            else
+            nextStep = 4;
+        }
+        else if (!adcStateB && avgB >= (avgA+avgC)>>1) {
+            adcStateB = 1;
+            if (fetStepDir > 0)
+            nextStep = 4;
+            else
+            nextStep = 5;
+        }
+        else if (adcStateB && avgB <= (avgA+avgC)>>1) {
+            adcStateB = 0;
+            if (fetStepDir > 0)
+            nextStep = 1;
+            else
+            nextStep = 2;
+        }
+        else if (!adcStateC && avgC >= (avgA+avgB)>>1) {
+            adcStateC = 1;
+            if (fetStepDir > 0)
+            nextStep = 2;
+            else
+            nextStep = 3;
+        }
+        else if (adcStateC && avgC <= (avgA+avgB)>>1) {
+            adcStateC = 0;
+            if (fetStepDir > 0)
+            nextStep = 5;
+            else
+            nextStep = 6;
+        }
 
-#ifdef ESC_DEBUG
-	digitalTogg(tp);
-#endif
-		}
-		else if (!adcStateC && avgC >= (avgA+avgB)>>1) {
-		    adcStateC = 1;
-		    nextStep = 2;
-		}
-		else if (adcStateC && avgC <= (avgA+avgB)>>1) {
-		    adcStateC = 0;
-		    nextStep = 5;
-		}
+        if (nextStep && periodMicros > adcMinPeriod) {
+            if (periodMicros > adcMaxPeriod)
+            periodMicros = adcMaxPeriod;
 
-		if (nextStep && periodMicros > adcMinPeriod) {
-		    if (periodMicros > adcMaxPeriod)
-			periodMicros = adcMaxPeriod;
+//          crossingPeriod = (crossingPeriod*3 + periodMicros)/4;
+//          crossingPeriod = (crossingPeriod*5 + periodMicros)/6;
+            adcCrossingPeriod += ((periodMicros<<15) - adcCrossingPeriod)>>3;
+            crossingPeriod = adcCrossingPeriod>>15;
+//          adcCrossingPeriod += ((periodMicros<<15) - adcCrossingPeriod)>>4;
+//          crossingPeriod = adcCrossingPeriod>>15;
+//          crossingPeriod = (crossingPeriod*7 + periodMicros)/8;
+//          crossingPeriod = (crossingPeriod*15 + periodMicros)/16;
 
-//		    crossingPeriod = (crossingPeriod*3 + periodMicros)/4;
-//		    crossingPeriod = (crossingPeriod*5 + periodMicros)/6;
-		    adcCrossingPeriod += ((periodMicros<<15) - adcCrossingPeriod)>>3;
-		    crossingPeriod = adcCrossingPeriod>>15;
-//		    adcCrossingPeriod += ((periodMicros<<15) - adcCrossingPeriod)>>4;
-//		    crossingPeriod = adcCrossingPeriod>>15;
-//		    crossingPeriod = (crossingPeriod*7 + periodMicros)/8;
-//		    crossingPeriod = (crossingPeriod*15 + periodMicros)/16;
+            // schedule next commutation
+            fetStep = nextStep;
+            fetCommutationMicros = 0;
+            timerSetAlarm1(crossingPeriod/2 - (ADC_DETECTION_TIME*(histSize+2))/2 - ADC_COMMUTATION_ADVANCE, fetCommutate, crossingPeriod);
 
-		    // schedule next commutation
-		    fetStep = nextStep;
-		    fetCommutationMicros = 0;
-		    timerSetAlarm1(crossingPeriod/2 - (ADC_DETECTION_TIME*(histSize+2))/2 - ADC_COMMUTATION_ADVANCE, fetCommutate, crossingPeriod);
+            // record crossing time
+            detectedCrossing = currentMicros;
 
-		    // record crossing time
-		    detectedCrossing = currentMicros;
+            // resize history based on period
+            adcEvaluateHistSize();
 
-		    // resize history based on period
-		    adcEvaluateHistSize();
+            // calculate next crossing detection time
+    //      nextCrossingDetect = crossingPeriod*2/3;
+            nextCrossingDetect = crossingPeriod*3/4;
+    //      nextCrossingDetect = crossingPeriod*6/8;
 
-		    // calculate next crossing detection time
-    //		nextCrossingDetect = crossingPeriod*2/3;
-		    nextCrossingDetect = crossingPeriod*3/4;
-    //		nextCrossingDetect = crossingPeriod*6/8;
-
-		    // record highest current draw for this run
-		    if (adcAvgAmps > adcMaxAmps)
-			adcMaxAmps = adcAvgAmps;
-		}
-	    }
-	}
+            // record highest current draw for this run
+            if (adcAvgAmps > adcMaxAmps)
+            adcMaxAmps = adcAvgAmps;
+        }
+        }
+    }
     }
 }
 
@@ -377,7 +390,7 @@ int32_t adcGetInstantCurrent(void) {
     ADC_ClearFlag(ADC1, ADC_FLAG_JEOC);
     ADC_SoftwareStartInjectedConvCmd(ADC1, ENABLE);
     while (ADC_GetFlagStatus(ADC1, ADC_FLAG_JEOC) != SET)
-	;
+    ;
     return (int32_t)ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_1);
 }
 
@@ -390,29 +403,29 @@ void adcSetConstants(void) {
 
     // bounds checking
     if (shuntResistance > ADC_MAX_SHUNT)
-	shuntResistance = ADC_MAX_SHUNT;
+    shuntResistance = ADC_MAX_SHUNT;
     else if (shuntResistance < ADC_MIN_SHUNT)
-	shuntResistance = ADC_MIN_SHUNT;
+    shuntResistance = ADC_MIN_SHUNT;
 
     if (advance > ADC_MAX_ADVANCE)
-	advance = ADC_MAX_ADVANCE;
+    advance = ADC_MAX_ADVANCE;
     else if (advance < ADC_MIN_ADVANCE)
-	advance = ADC_MIN_ADVANCE;
+    advance = ADC_MIN_ADVANCE;
 
     if (blankingMicros > ADC_MAX_BLANKING_MICROS)
-	blankingMicros = ADC_MAX_BLANKING_MICROS;
+    blankingMicros = ADC_MAX_BLANKING_MICROS;
     else if (blankingMicros < ADC_MIN_BLANKING_MICROS)
-	blankingMicros = ADC_MIN_BLANKING_MICROS;
+    blankingMicros = ADC_MIN_BLANKING_MICROS;
 
     if (minPeriod > ADC_MAX_MIN_PERIOD)
-	minPeriod = ADC_MAX_MIN_PERIOD;
+    minPeriod = ADC_MAX_MIN_PERIOD;
     else if (minPeriod < ADC_MIN_MIN_PERIOD)
-	minPeriod = ADC_MIN_MIN_PERIOD;
+    minPeriod = ADC_MIN_MIN_PERIOD;
 
     if (maxPeriod > ADC_MAX_MAX_PERIOD)
-	maxPeriod = ADC_MAX_MAX_PERIOD;
+    maxPeriod = ADC_MAX_MAX_PERIOD;
     else if (maxPeriod < ADC_MIN_MAX_PERIOD)
-	maxPeriod = ADC_MIN_MAX_PERIOD;
+    maxPeriod = ADC_MIN_MAX_PERIOD;
 
     adcToAmps = ((ADC_TO_VOLTAGE / ((1<<(ADC_AMPS_PRECISION))+1)) / (ADC_SHUNT_GAIN * shuntResistance / 1000.0f));
     adcAdvance = 100.0f / (advance * (50.0f / 30.0f));

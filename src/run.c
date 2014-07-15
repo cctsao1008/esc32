@@ -171,11 +171,20 @@ uint8_t runDuty(float duty) {
 
 // 0 => 2^16
 void runSetpoint(uint16_t val) {
-    uint32_t duty;
+    if (state == ESC_STATE_RUNNING) {
+	if (runMode == OPEN_LOOP) {
+	    fetSetDutyCycle(fetPeriod * val / ((1<<16)-1));
+	}
+	else if (runMode == CLOSED_LOOP_RPM) {
+	    float target = p[PWM_RPM_SCALE] * val * (1.0f / ((1<<16)-1));
 
-    duty = fetPeriod * val / ((1<<16)-1);
-
-    fetSetDutyCycle(duty);
+	    // limit to configured maximum
+	    targetRpm = (target > p[PWM_RPM_SCALE]) ? p[PWM_RPM_SCALE] : target;
+	}
+    }
+    else if (state == ESC_STATE_STOPPED && val > 0) {
+	runStart();
+    }
 }
 
 void runNewInput(uint16_t setpoint) {

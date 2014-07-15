@@ -30,12 +30,12 @@ void serialStartTxDMA() {
 
     SERIAL_TX_DMA->CMAR = (uint32_t)&s->txBuf[s->txTail];
     if (s->txHead > s->txTail) {
-	SERIAL_TX_DMA->CNDTR = s->txHead - s->txTail;
-	s->txTail = s->txHead;
+    SERIAL_TX_DMA->CNDTR = s->txHead - s->txTail;
+    s->txTail = s->txHead;
     }
     else {
-	SERIAL_TX_DMA->CNDTR = SERIAL_TX_BUFSIZE - s->txTail;
-	s->txTail = 0;
+    SERIAL_TX_DMA->CNDTR = SERIAL_TX_BUFSIZE - s->txTail;
+    s->txTail = 0;
     }
 
     DMA_Cmd(SERIAL_TX_DMA, ENABLE);
@@ -48,7 +48,7 @@ void serialWrite(int ch) {
     s->txHead = (s->txHead + 1) % SERIAL_TX_BUFSIZE;
 
     if (!(SERIAL_TX_DMA->CCR & 1))
-	serialStartTxDMA();
+    serialStartTxDMA();
 }
 
 unsigned char serialAvailable() {
@@ -62,14 +62,14 @@ int serialRead() {
 
     ch = s->rxBuf[SERIAL_RX_BUFSIZE - s->rxPos];
     if (--s->rxPos == 0)
-	s->rxPos = SERIAL_RX_BUFSIZE;
+    s->rxPos = SERIAL_RX_BUFSIZE;
 
     return ch;
 }
 
 void serialPrint(const char *str) {
     while (*str)
-	serialWrite(*(str++));
+    serialWrite(*(str++));
 }
 
 void serialOpenPort(int baud) {
@@ -162,16 +162,16 @@ void DMA1_Channel4_IRQHandler(void) {
     DMA_Cmd(SERIAL_TX_DMA, DISABLE);
 
     if (serialPort.txHead != serialPort.txTail)
-	serialStartTxDMA();
+    serialStartTxDMA();
 }
 
 void serialSetConstants(void) {
     p[BAUD_RATE] = (int)p[BAUD_RATE];
 
     if (p[BAUD_RATE] < SERIAL_MIN_BAUD)
-	p[BAUD_RATE] = SERIAL_MIN_BAUD;
+    p[BAUD_RATE] = SERIAL_MIN_BAUD;
     else if (p[BAUD_RATE] > SERIAL_MAX_BAUD)
-	p[BAUD_RATE] = SERIAL_MAX_BAUD;
+    p[BAUD_RATE] = SERIAL_MAX_BAUD;
 
     serialOpenPort(p[BAUD_RATE]);
 }

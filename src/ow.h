@@ -21,22 +21,22 @@
 
 #include "misc.h"
 
-#define OW_RESET_MIN	    480
-#define OW_RESET_MAX	    580
+#define OW_RESET_MIN        480
+#define OW_RESET_MAX        580
 
-#define OW_ROM_READ	    0x33
-#define OW_ROM_MATCH	    0x55	    // not yet supported
-#define OW_ROM_SKIP	    0xCC
-#define OW_VERSION	    0x03
-#define OW_PARAM_READ	    0x04
-#define OW_PARAM_WRITE	    0x05
-#define OW_CONFIG_READ	    0x06
-#define OW_CONFIG_WRITE	    0x07
+#define OW_ROM_READ     0x33
+#define OW_ROM_MATCH        0x55        // not yet supported
+#define OW_ROM_SKIP     0xCC
+#define OW_VERSION      0x03
+#define OW_PARAM_READ       0x04
+#define OW_PARAM_WRITE      0x05
+#define OW_CONFIG_READ      0x06
+#define OW_CONFIG_WRITE     0x07
 #define OW_CONFIG_DEFAULT   0x08
-#define OW_SET_MODE	    0x09
-#define OW_GET_MODE	    0x0A
+#define OW_SET_MODE     0x09
+#define OW_GET_MODE     0x0A
 
-#define OW_UID_ADDRESS	    0x1FFFF7E8
+#define OW_UID_ADDRESS      0x1FFFF7E8
 
 enum {
     OW_RESET_STATE_0,

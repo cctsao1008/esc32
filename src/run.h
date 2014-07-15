@@ -21,13 +21,13 @@
 
 #include "misc.h"
 
-#define RUN_FREQ		2000		    // Hz
-#define RUN_ARM_COUNT		20		    // number of valid PWM signals seen before arming
-#define RUN_MIN_MAX_CURRENT	0.0		    // Amps
-#define RUN_MAX_MAX_CURRENT	75.0		    // Amps
+#define RUN_FREQ        2000            // Hz
+#define RUN_ARM_COUNT       20          // number of valid PWM signals seen before arming
+#define RUN_MIN_MAX_CURRENT 0.0         // Amps
+#define RUN_MAX_MAX_CURRENT 75.0            // Amps
 
 //#define RUN_ENABLE_IWDG
-#define RUN_LSI_FREQ		40000		    // 40 KHz LSI for IWDG
+#define RUN_LSI_FREQ        40000           // 40 KHz LSI for IWDG
 
 enum runCommandModes {
     CLI_MODE = 0,

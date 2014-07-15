@@ -79,40 +79,40 @@ int main(void) {
 
     // self calibrating idle timer loop
     {
-	    uint32_t lastRunCount = 0;
-	    uint32_t thisCycles = 0, lastCycles = 0;
+        uint32_t lastRunCount = 0;
+        uint32_t thisCycles = 0, lastCycles = 0;
         volatile uint32_t cycles;
         volatile uint32_t *DWT_CYCCNT = (uint32_t *)0xE0001004;
         volatile uint32_t *DWT_CONTROL = (uint32_t *)0xE0001000;
         volatile uint32_t *SCB_DEMCR = (uint32_t *)0xE000EDFC;
 
         *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
-        *DWT_CONTROL = *DWT_CONTROL | 1;	// enable the counter
+        *DWT_CONTROL = *DWT_CONTROL | 1;    // enable the counter
 
-	minCycles = 0xffff;
+    minCycles = 0xffff;
         while (1) {
             idleCounter++;
 
-	    if (runCount != lastRunCount && !(runCount % (RUN_FREQ / 1000))) {
-		if (commandMode == CLI_MODE)
-		    cliCheck();
-		else
-		    binaryCheck();
-		lastRunCount = runCount;
-	    }
+        if (runCount != lastRunCount && !(runCount % (RUN_FREQ / 1000))) {
+        if (commandMode == CLI_MODE)
+            cliCheck();
+        else
+            binaryCheck();
+        lastRunCount = runCount;
+        }
 
             thisCycles = *DWT_CYCCNT;
-	    cycles = thisCycles - lastCycles;
-	    lastCycles = thisCycles;
+        cycles = thisCycles - lastCycles;
+        lastCycles = thisCycles;
 
             // record shortest number of instructions for loop
-	    totalCycles += cycles;
+        totalCycles += cycles;
             if (cycles < minCycles)
                 minCycles = cycles;
         }
     }
-	
-	return 0;
+    
+    return 0;
 }
 
 #ifdef USE_FULL_ASSERT
@@ -129,31 +129,31 @@ void assert_failed(uint8_t* file, uint32_t line) {
 void HardFault_Handler(void) {
     FET_PANIC;
     while (1)
-	;
+    ;
 }
 
 void MemManage_Handler(void) {
     FET_PANIC;
     while (1)
-	;
+    ;
 }
 
 void BusFault_Handler(void) {
     FET_PANIC;
     while (1)
-	;
+    ;
 }
 
 void UsageFault_Handler(void) {
     FET_PANIC;
     while (1)
-	;
+    ;
 }
 
 void reset_wait(void) {
     FET_PANIC;
     while (1)
-	;
+    ;
 }
 
 

@@ -116,18 +116,18 @@ void PWM_IRQ_HANDLER(void) {
 
     // is this an OW reset pulse?
     if (state == ESC_STATE_DISARMED && edge == 1 && (periodValue - pwmValue) > OW_RESET_MIN && (periodValue - pwmValue) < OW_RESET_MAX) {
-	owReset();
+    owReset();
     }
     // look for good RC PWM input
     else if (inputMode == ESC_INPUT_PWM && periodValue >= pwmMinPeriod && periodValue <= pwmMaxPeriod && pwmValue >= pwmMinValue && pwmValue <= pwmMaxValue) {
-	if (edge == 0) {
-	    pwmValidMicros = timerMicros;
-	    runNewInput(pwmValue);
-	}
+    if (edge == 0) {
+        pwmValidMicros = timerMicros;
+        runNewInput(pwmValue);
+    }
     }
     // otherwise if already in OW mode, pass control to OW
     else if (inputMode == ESC_INPUT_OW) {
-	owEdgeDetect(edge);
+    owEdgeDetect(edge);
     }
 }
 
@@ -143,9 +143,9 @@ void pwmSetConstants(void) {
     pwmMinStart = p[PWM_MIN_START] = (int)p[PWM_MIN_START];
 
     if (rpmScale < PWM_RPM_SCALE_MIN)
-	rpmScale = PWM_RPM_SCALE_MIN;
+    rpmScale = PWM_RPM_SCALE_MIN;
     else if (rpmScale > PWM_RPM_SCALE_MAX)
-	rpmScale = PWM_RPM_SCALE_MAX;
+    rpmScale = PWM_RPM_SCALE_MAX;
 
     p[PWM_RPM_SCALE] = rpmScale;
 }

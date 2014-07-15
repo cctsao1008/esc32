@@ -21,57 +21,57 @@
 
 #include "stm32f10x_can.h"
 
-#define CAN_CAN		CAN1
-#define CAN_PORT	GPIOA
-#define CAN_RX_PIN	GPIO_Pin_11
-#define CAN_TX_PIN	GPIO_Pin_12
+#define CAN_CAN     CAN1
+#define CAN_PORT    GPIOA
+#define CAN_RX_PIN  GPIO_Pin_11
+#define CAN_TX_PIN  GPIO_Pin_12
 
-#define CAN_UUID	*((uint32_t *)(0x1FFFF7E8 + 0))
+#define CAN_UUID    *((uint32_t *)(0x1FFFF7E8 + 0))
 
 // Logical Communications Channel
 // 2 bits [28:27]
-#define CAN_LCC_MASK	    ((uint32_t)0x3<<30)
+#define CAN_LCC_MASK        ((uint32_t)0x3<<30)
 #define CAN_LCC_EXCEPTION   ((uint32_t)0x0<<30)
-#define CAN_LCC_HIGH	    ((uint32_t)0x1<<30)
-#define CAN_LCC_NORMAL	    ((uint32_t)0x2<<30)
-#define CAN_LCC_INFO	    ((uint32_t)0x3<<30)
+#define CAN_LCC_HIGH        ((uint32_t)0x1<<30)
+#define CAN_LCC_NORMAL      ((uint32_t)0x2<<30)
+#define CAN_LCC_INFO        ((uint32_t)0x3<<30)
 
 // Target Type
 // 1 bit [26:26]
-#define CAN_TT_MASK	    ((uint32_t)0x1<<29)
-#define CAN_TT_GROUP	    ((uint32_t)0x0<<29)
-#define CAN_TT_NODE	    ((uint32_t)0x1<<29)
+#define CAN_TT_MASK         ((uint32_t)0x1<<29)
+#define CAN_TT_GROUP        ((uint32_t)0x0<<29)
+#define CAN_TT_NODE         ((uint32_t)0x1<<29)
 
 // Function ID
 // 4 bits [25:22]
-#define CAN_FID_MASK	    ((uint32_t)0xf<<25)
+#define CAN_FID_MASK        ((uint32_t)0xf<<25)
 #define CAN_FID_RESET_BUS   ((uint32_t)0x0<<25)
-#define CAN_FID_ACK	    ((uint32_t)0x1<<25)
-#define CAN_FID_NACK	    ((uint32_t)0x2<<25)
-#define CAN_FID_CMD	    ((uint32_t)0x3<<25)
-#define CAN_FID_GET	    ((uint32_t)0x4<<25)
-#define CAN_FID_SET	    ((uint32_t)0x5<<25)
-#define CAN_FID_REPLY	    ((uint32_t)0x6<<25)
+#define CAN_FID_ACK         ((uint32_t)0x1<<25)
+#define CAN_FID_NACK        ((uint32_t)0x2<<25)
+#define CAN_FID_CMD         ((uint32_t)0x3<<25)
+#define CAN_FID_GET         ((uint32_t)0x4<<25)
+#define CAN_FID_SET         ((uint32_t)0x5<<25)
+#define CAN_FID_REPLY       ((uint32_t)0x6<<25)
 #define CAN_FID_REQ_ADDR    ((uint32_t)0x7<<25)
 #define CAN_FID_GRANT_ADDR  ((uint32_t)0x8<<25)
-#define CAN_FID_ERROR	    ((uint32_t)0x9<<25)
-#define CAN_FID_PING	    ((uint32_t)0xa<<25)
+#define CAN_FID_ERROR       ((uint32_t)0x9<<25)
+#define CAN_FID_PING        ((uint32_t)0xa<<25)
 
 // Data Object Code
 // 6 bits [21:16]
-#define CAN_DOC_MASK	    ((uint32_t)0x3f<<19)
+#define CAN_DOC_MASK        ((uint32_t)0x3f<<19)
 
 // Source ID
 // 5 bits [15:11]
-#define CAN_SID_MASK	    ((uint32_t)0x1f<<14)
+#define CAN_SID_MASK        ((uint32_t)0x1f<<14)
 
 // Target ID
 // 5 bits [10:6]
-#define CAN_TID_MASK	    ((uint32_t)0x1f<<9)
+#define CAN_TID_MASK        ((uint32_t)0x1f<<9)
 
 // Sequence ID
 // 6 bits [5:0]
-#define CAN_SEQ_MASK	    ((uint32_t)0x3f<<3)
+#define CAN_SEQ_MASK        ((uint32_t)0x3f<<3)
 
 enum {
     CAN_TYPE_ESC = 1,
@@ -144,10 +144,10 @@ typedef struct {
 } __attribute__((packed)) canGroup12_t;
 
 typedef struct {
-    unsigned int value1 : 16;
-    unsigned int value2 : 16;
-    unsigned int value3 : 16;
-    unsigned int value4 : 16;
+    uint16_t value1;
+    uint16_t value2;
+    uint16_t value3;
+    uint16_t value4;
 } __attribute__((packed)) canGroup16_t;
 
 typedef struct {

@@ -25,51 +25,51 @@
 #define ADC_FAST_SAMPLE
 
 #ifdef ADC_FAST_SAMPLE
-    #define ADC_SAMPLE_TIME	ADC_SampleTime_7Cycles5
-    #define ADC_DETECTION_TIME	(uint16_t)((7.5+12.5)*4*TIMER_MULT/12)	    // 4 ADC groups w/7.5 clk sample @ 12Mhz ADC clock (in us)
+    #define ADC_SAMPLE_TIME ADC_SampleTime_7Cycles5
+    #define ADC_DETECTION_TIME  (uint16_t)((7.5+12.5)*4*TIMER_MULT/12)      // 4 ADC groups w/7.5 clk sample @ 12Mhz ADC clock (in us)
 #else
-    #define ADC_SAMPLE_TIME	ADC_SampleTime_28Cycles5
-    #define ADC_DETECTION_TIME	(uint16_t)((28.5+12.5)*2*TIMER_MULT/12)	    // 2 ADC groups w/28.5 clk sample @ 12Mhz ADC clock (in us)
-#endif	// ADC_FAST_SAMPLE
+    #define ADC_SAMPLE_TIME ADC_SampleTime_28Cycles5
+    #define ADC_DETECTION_TIME  (uint16_t)((28.5+12.5)*2*TIMER_MULT/12)     // 2 ADC groups w/28.5 clk sample @ 12Mhz ADC clock (in us)
+#endif  // ADC_FAST_SAMPLE
 
 #define ADC_CHANNELS            2
 #define ADC_CLOCK               RCC_PCLK2_Div6              // 12Mhz
 
 #define ADC_REF_VOLTAGE         3.3f
-#define ADC_TO_VOLTAGE		(ADC_REF_VOLTAGE / (1<<12)) // 12 bit ADC resolution
+#define ADC_TO_VOLTAGE      (ADC_REF_VOLTAGE / (1<<12)) // 12 bit ADC resolution
 
-#define ADC_AMPS_PRECISION	16
-#define ADC_SHUNT_GAIN		50.9f
+#define ADC_AMPS_PRECISION  16
+#define ADC_SHUNT_GAIN      50.9f
 
-#define ADC_VOLTS_PRECISION	16
-#define ADC_VOLTS_SLOPE		((10.0f + 1.5f) / 1.5f)    // Rtop = 10K, Rbot = 1.5K
-#define ADC_TO_VOLTS		(ADC_TO_VOLTAGE * ADC_VOLTS_SLOPE / ((1<<(ADC_VOLTS_PRECISION))+1))
+#define ADC_VOLTS_PRECISION 16
+#define ADC_VOLTS_SLOPE     ((10.0f + 1.5f) / 1.5f)    // Rtop = 10K, Rbot = 1.5K
+#define ADC_TO_VOLTS        (ADC_TO_VOLTAGE * ADC_VOLTS_SLOPE / ((1<<(ADC_VOLTS_PRECISION))+1))
 
-#define ADC_MIN_SHUNT		0.05	    // milli Ohms
-#define ADC_MAX_SHUNT		1.0	    // milli Ohms
-#define ADC_MIN_ADVANCE		0.1	    // electrical degrees
-#define ADC_MAX_ADVANCE		30.0	    // electrical degrees
-#define ADC_MIN_BLANKING_MICROS	0	    // us
-#define ADC_MAX_BLANKING_MICROS 100	    // us
-#define ADC_MIN_MIN_PERIOD	20	    // us
-#define ADC_MAX_MIN_PERIOD	500	    // us
-#define ADC_MIN_MAX_PERIOD	1000	    // us
-#define ADC_MAX_MAX_PERIOD	20000	    // us
+#define ADC_MIN_SHUNT       0.05        // milli Ohms
+#define ADC_MAX_SHUNT       1.0     // milli Ohms
+#define ADC_MIN_ADVANCE     0.1     // electrical degrees
+#define ADC_MAX_ADVANCE     30.0        // electrical degrees
+#define ADC_MIN_BLANKING_MICROS 0       // us
+#define ADC_MAX_BLANKING_MICROS 100     // us
+#define ADC_MIN_MIN_PERIOD  20      // us
+#define ADC_MAX_MIN_PERIOD  500     // us
+#define ADC_MIN_MAX_PERIOD  1000        // us
+#define ADC_MAX_MAX_PERIOD  20000       // us
 
-#define ADC_HIST_SIZE		64
+#define ADC_HIST_SIZE       64
 #ifdef ADC_FAST_SAMPLE
-#define ADC_MIN_COMP		30
+#define ADC_MIN_COMP        30
 #else
-#define ADC_MIN_COMP		15
+#define ADC_MIN_COMP        15
 #endif
-#define ADC_CROSSING_TIMEOUT	(250000*TIMER_MULT)
+#define ADC_CROSSING_TIMEOUT    (250000*TIMER_MULT)
 
-//#define ADC_COMMUTATION_ADVANCE	(0)				    // 0 deg
-//#define ADC_COMMUTATION_ADVANCE	(crossingPeriod/16)		    // 3.75 deg
-//#define ADC_COMMUTATION_ADVANCE	(crossingPeriod/8)		    // 7.5 deg
-//#define ADC_COMMUTATION_ADVANCE	(crossingPeriod/4)		    // 15 deg
-//#define ADC_COMMUTATION_ADVANCE	(crossingPeriod/2)		    // 30 deg
-#define ADC_COMMUTATION_ADVANCE	(crossingPeriod/adcAdvance)		    // variable
+//#define ADC_COMMUTATION_ADVANCE   (0)                 // 0 deg
+//#define ADC_COMMUTATION_ADVANCE   (crossingPeriod/16)         // 3.75 deg
+//#define ADC_COMMUTATION_ADVANCE   (crossingPeriod/8)          // 7.5 deg
+//#define ADC_COMMUTATION_ADVANCE   (crossingPeriod/4)          // 15 deg
+//#define ADC_COMMUTATION_ADVANCE   (crossingPeriod/2)          // 30 deg
+#define ADC_COMMUTATION_ADVANCE (crossingPeriod/adcAdvance)         // variable
 
 extern float adcToAmps;
 extern int16_t adcAdvance;
