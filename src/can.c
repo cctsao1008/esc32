@@ -160,12 +160,18 @@ static inline void canProcessAddr(canPacket_t *pkt) {
 
 static void inline canBusReset(void) {
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
+    int i;
 
     runDisarm(REASON_CAN);
 
     canData.networkId = 0;
     canData.groupId = 0;
     canData.subGroupId = 0;
+    canData.telemRate = 0;
+
+    for (i = 0; i < CAN_TELEM_NUM; i++)
+    canData.telemValues[i] = 0;
+
 
     // Initially only listen for CAN_FID_GRANT_ADDR
     CAN_FilterInitStructure.CAN_FilterNumber = 0;
@@ -437,7 +443,40 @@ static inline void canProcessPos(canPacket_t *pkt) {
     fetSetAngle(data[0]);
 }
 
+void canSendStatus(void) {
+    esc32CanStatus_t stat;
+
+    stat.state = state;
+    stat.vin = avgVolts * 100;
+    stat.amps = avgAmps * 100;
+    stat.rpm = rpm;
+    stat.duty = fetActualDutyCycle * 255 /fetPeriod;
+    stat.errors = fetTotalBadDetects;
+    stat.errCode = disarmReason;
+
+    canSend(CAN_LCC_INFO | CAN_TT_NODE | CAN_FID_TELEM | (CAN_TELEM_STATUS<<19), 0, canGetSeqId(), 8, &stat);
+}
+
+void canTelemDo(void) {
+    int i;
+
+    for (i = 0; i < CAN_TELEM_NUM; i++) {
+    switch (canData.telemValues[i]) {
+        case 0:
+        break;
+
+        case CAN_TELEM_STATUS:
+        canSendStatus();
+        break;
+
+        default:
+        break;
+    }
+    }
+}
+
 static inline void canProcessCmd(canPacket_t *pkt) {
+    uint8_t *data = (uint8_t *)pkt->data;
     inputMode = ESC_INPUT_CAN;
 
     switch (pkt->doc) {
@@ -506,11 +545,15 @@ static inline void canProcessCmd(canPacket_t *pkt) {
     break;
 
     case CAN_CMD_TELEM_RATE:
-    // TODO
+    canData.telemRate = *(uint16_t *)pkt->data;
+    if (canData.telemRate > RUN_FREQ)
+        canData.telemRate = RUN_FREQ;
+    canAck(pkt);
     break;
 
     case CAN_CMD_TELEM_VALUE:
-    // TODO
+    canData.telemValues[data[0]] = data[1];
+    canAck(pkt);
     break;
 
     case CAN_CMD_RESET:
@@ -548,6 +591,12 @@ void canProcess(void) {
 
     loops++;
 
+    // telemetry
+    #if 0
+    if (canData.telemRate && !(loops % (RUN_FREQ / canData.telemRate)))
+    canTelemDo();
+    #endif
+
     if (CAN_MessagePending(CAN_CAN, CAN_FIFO0) == 0) {
     // keep trying to get an address
     if (canData.networkId == 0 && !(loops % (100 * 1000 / RUN_FREQ)))
@@ -559,9 +608,7 @@ void canProcess(void) {
     CAN_Receive(CAN_CAN, CAN_FIFO0, &rx);
 
     // ignore standard id's
-    if (rx.IDE == CAN_Id_Standard)
-    return;
-
+    if (rx.IDE != CAN_Id_Standard) {
     pkt.id = rx.ExtId << 3;
     pkt.doc = (pkt.id & CAN_DOC_MASK)>>19;
     pkt.sid = (pkt.id & CAN_SID_MASK)>>14;
@@ -606,8 +653,9 @@ void canProcess(void) {
     break;
 
     default:
-    NOP;
-    break;
+        NOP;
+        break;
+    }
     }
 }
 
@@ -633,7 +681,7 @@ void canInit(void) {
 
     // CAN cell init
     CAN_InitStructure.CAN_TTCM = DISABLE;
-    CAN_InitStructure.CAN_ABOM = DISABLE;
+    CAN_InitStructure.CAN_ABOM = ENABLE;
     CAN_InitStructure.CAN_AWUM = DISABLE;
     CAN_InitStructure.CAN_NART = DISABLE;
     CAN_InitStructure.CAN_RFLM = DISABLE;
@@ -668,6 +716,8 @@ void canInit(void) {
 //    CAN_ITConfig(CAN_CAN, CAN_IT_TME, ENABLE);
 //    CAN_ITConfig(CAN_CAN, CAN_IT_FMP0, ENABLE);
 //    CAN_ITConfig(CAN_CAN, CAN_IT_FMP1, ENABLE);
+
+    canData.uuid = XXH32((void *)CAN_UUID, 3*4, 0);
 
     canBusReset();
     canSendGetAddr();

@@ -36,7 +36,7 @@ OBJECT_DIR	 = $(ROOT)/obj
 BIN_DIR		 = $(ROOT)/bin
 
 # Source files common to all targets
-ESC32_SRC	 = startup_stm32f10x_md.S adc.c binary.c cli.c can.c config.c digital.c fet.c getbuildnum.c main.c misc.c ow.c pwm.c rcc.c run.c serial.c \
+ESC32_SRC	 = startup_stm32f10x_md.S adc.c binary.c cli.c xxhash.c can.c config.c digital.c fet.c getbuildnum.c main.c misc.c ow.c pwm.c rcc.c run.c serial.c \
 		   stm32f10x_adc.c stm32f10x_dbgmcu.c stm32f10x_dma.c stm32f10x_exti.c stm32f10x_flash.c stm32f10x_gpio.c stm32f10x_iwdg.c \
 		   stm32f10x_pwr.c stm32f10x_rcc.c stm32f10x_tim.c stm32f10x_can.c stm32f10x_usart.c system_stm32f10x.c timer.c syscalls.c
 

@@ -56,6 +56,7 @@
 #define CAN_FID_GRANT_ADDR  ((uint32_t)0x8<<25)
 #define CAN_FID_ERROR       ((uint32_t)0x9<<25)
 #define CAN_FID_PING        ((uint32_t)0xa<<25)
+#define CAN_FID_TELEM       ((uint32_t)0xb<<25)
 
 // Data Object Code
 // 6 bits [21:16]
@@ -80,7 +81,8 @@ enum {
     CAN_TYPE_LED,
     CAN_TYPE_OSD,
     CAN_TYPE_UART,
-    CAN_TYPE_HUB
+    CAN_TYPE_HUB,
+    CAN_TYPE_NUM
 };
 
 enum {
@@ -113,6 +115,19 @@ enum {
     CAN_DATA_PARAM,
     CAN_DATA_TELEM,
     CAN_DATA_VERSION
+};
+
+// telemetry values
+enum {
+    CAN_TELEM_NONE = 0,
+    CAN_TELEM_STATUS,
+    CAN_TELEM_STATE,
+    CAN_TELEM_TEMP,
+    CAN_TELEM_VIN,
+    CAN_TELEM_AMPS,
+    CAN_TELEM_RPM,
+    CAN_TELEM_ERRORS,
+    CAN_TELEM_NUM
 };
 
 typedef struct {
@@ -151,9 +166,21 @@ typedef struct {
 } __attribute__((packed)) canGroup16_t;
 
 typedef struct {
+    unsigned int state :    3;
+    unsigned int vin :      12; // x 100
+    unsigned int amps :     14; // x 100
+    unsigned int rpm :      15;
+    unsigned int duty :     8;  // x (255/100)
+    unsigned int errors :   9;
+    unsigned int errCode :  3;
+} esc32CanStatus_t;
+
+typedef struct {
     uint32_t uuid;
     uint32_t mailboxFull;
     uint32_t packetsReceived;
+    uint16_t telemRate;
+    uint8_t telemValues[CAN_TELEM_NUM];
     uint8_t networkId;
     uint8_t groupId;
     uint8_t subGroupId;
