@@ -81,7 +81,7 @@ int main(void) {
     {
         uint32_t lastRunCount = 0;
         uint32_t thisCycles = 0, lastCycles = 0;
-        volatile uint32_t cycles;
+        volatile uint32_t cycles = 0;;
         volatile uint32_t *DWT_CYCCNT = (uint32_t *)0xE0001004;
         volatile uint32_t *DWT_CONTROL = (uint32_t *)0xE0001000;
         volatile uint32_t *SCB_DEMCR = (uint32_t *)0xE000EDFC;
