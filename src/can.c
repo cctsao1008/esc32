@@ -23,6 +23,7 @@
 #include "pwm.h"
 #include "fet.h"
 #include "misc.h"
+#include "timer.h"
 #include "xxhash.h"
 
 canDataStruct_t canData;
@@ -162,7 +163,7 @@ static void inline canBusReset(void) {
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
     int i;
 
-    runDisarm(REASON_CAN);
+    runDisarm(REASON_CAN_USER);
 
     canData.networkId = 0;
     canData.groupId = 0;
@@ -222,7 +223,7 @@ static inline void canProcessSet(canPacket_t *pkt) {
 
     case CAN_DATA_RUN_MODE:
     if (*(uint8_t *)pkt->data < NUM_RUN_MODES) {
-        runDisarm(REASON_CAN);
+        runDisarm(REASON_CAN_USER);
         runMode = *(uint8_t *)pkt->data;
         canAck(pkt);
     }
@@ -487,7 +488,7 @@ static inline void canProcessCmd(canPacket_t *pkt) {
     break;
 
     case CAN_CMD_DISARM:
-    runDisarm(REASON_CAN);
+    runDisarm(REASON_CAN_USER);
     canAck(pkt);
     break;
 
@@ -502,18 +503,22 @@ static inline void canProcessCmd(canPacket_t *pkt) {
     break;
 
     case CAN_CMD_SETPOINT10:
+    canData.validMicros = timerMicros;
     canProcessSetpoint10(pkt);
     break;
 
     case CAN_CMD_SETPOINT12:
+    canData.validMicros = timerMicros;
     canProcessSetpoint12(pkt);
     break;
 
     case CAN_CMD_SETPOINT16:
+    canData.validMicros = timerMicros;
     canProcessSetpoint16(pkt);
     break;
 
     case CAN_CMD_RPM:
+    canData.validMicros = timerMicros;
     canProcessRpm(pkt);
     break;
 
@@ -592,10 +597,8 @@ void canProcess(void) {
     loops++;
 
     // telemetry
-    #if 0
     if (canData.telemRate && !(loops % (RUN_FREQ / canData.telemRate)))
     canTelemDo();
-    #endif
 
     if (CAN_MessagePending(CAN_CAN, CAN_FIFO0) == 0) {
     // keep trying to get an address

@@ -290,6 +290,17 @@ static inline void runWatchDog(void) {
         if (p > PWM_TIMEOUT)
         runDisarm(REASON_PWM_TIMEOUT);
     }
+    #if 0
+    // timeout if CAN updates cease
+    else if (inputMode == ESC_INPUT_CAN) {
+        uint32_t a = canData.validMicros;
+
+        a = (t >= a) ? (t - a) : (TIMER_MASK - a + t);
+
+        if (a > CAN_TIMEOUT)
+        runDisarm(REASON_CAN_TIMEOUT);
+    }
+    #endif
 
     if (state >= ESC_STATE_STARTING && d > ADC_CROSSING_TIMEOUT) {
         if (fetDutyCycle > 0) {
@@ -492,7 +503,9 @@ void SysTick_Handler(void) {
     // reload the hardware watchdog
     runFeedIWDG();
 
+    #if 0
     canProcess();
+    #endif
 
     avgVolts = adcAvgVolts * ADC_TO_VOLTS;
     avgAmps = (adcAvgAmps - adcAmpsOffset) * adcToAmps;

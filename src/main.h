@@ -19,21 +19,21 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#define VERSION			"2.0.0"
+#define VERSION         "2.0.0"
 
 #include "digital.h"
 
-#define ESC_DEBUG				// uncomment to include debugging code
+#define ESC_DEBUG               // uncomment to include debugging code
 
-#define GPIO_ERROR_LED_PORT	GPIOB
-#define GPIO_ERROR_LED_PIN	GPIO_Pin_4
-#define GPIO_STATUS_LED_PORT	GPIOB
-#define GPIO_STATUS_LED_PIN	GPIO_Pin_3
-#define GPIO_TP_PORT		GPIOB
-#define GPIO_TP_PIN		GPIO_Pin_15
+#define GPIO_ERROR_LED_PORT GPIOB
+#define GPIO_ERROR_LED_PIN  GPIO_Pin_4
+#define GPIO_STATUS_LED_PORT    GPIOB
+#define GPIO_STATUS_LED_PIN GPIO_Pin_3
+#define GPIO_TP_PORT        GPIOB
+#define GPIO_TP_PIN     GPIO_Pin_15
 
-#define NOP			{__asm volatile ("nop\n\t");}
-#define NOPS_4			{NOP; NOP; NOP; NOP;}
+#define NOP         {__asm volatile ("nop\n\t");}
+#define NOPS_4          {NOP; NOP; NOP; NOP;}
 
 enum escStates {
     ESC_STATE_DISARMED = 0,
@@ -58,9 +58,10 @@ enum escDisarmReasons {
     REASON_CROSSING_TIMEOUT,
     REASON_PWM_TIMEOUT,
     REASON_LOW_VOLTAGE,
-    REASON_CLI,
-    REASON_BINARY,
-    REASON_CAN
+    REASON_CLI_USER,
+    REASON_BINARY_USER,
+    REASON_CAN_USER,
+    REASON_CAN_TIMEOUT
 };
 
 extern digitalPin *errorLed, *statusLed, *tp;
