@@ -46,6 +46,7 @@ enum binaryCommands {
     BINARY_COMMAND_TELEM_RATE,
     BINARY_COMMAND_VERSION,
     BINARY_COMMAND_TELEM_VALUE,
+    BINARY_COMMAND_GET_PARAM_ID,
     BINARY_COMMAND_ACK = 250,
     BINARY_COMMAND_NACK
 };
@@ -73,7 +74,7 @@ enum binaryValues {
 typedef struct {
     uint8_t command;
     uint16_t seqId;
-    float params[2];
+    float params[4];
 } __attribute__((packed)) binaryCommandStruct_t;
 
 extern void binaryCheck(void);

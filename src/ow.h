@@ -33,10 +33,11 @@
 #define OW_CONFIG_READ      0x06
 #define OW_CONFIG_WRITE     0x07
 #define OW_CONFIG_DEFAULT   0x08
-#define OW_SET_MODE     0x09
-#define OW_GET_MODE     0x0A
+#define OW_SET_MODE	    0x09
+#define OW_GET_MODE	    0x0A
+#define OW_GET_PARAM_ID     0x0B
 
-#define OW_UID_ADDRESS      0x1FFFF7E8
+#define OW_UID_ADDRESS	    0x1FFFF7E8
 
 enum {
     OW_RESET_STATE_0,
@@ -47,7 +48,7 @@ enum {
 };
 
 extern uint8_t owROMCode[8];
-extern uint8_t owBuf[16];
+extern uint8_t owBuf[32];
 extern uint8_t *owBufPointer;
 extern uint8_t owState;
 extern uint8_t owLastCommand;

@@ -25,7 +25,8 @@
 
 binaryCommandStruct_t commandBuf;
 uint32_t binaryLoop;
-uint16_t sendAck, sendNack;
+uint16_t sendAck, sendNack, sendParamId;
+int16_t paramId;
 uint32_t binaryTelemRate;
 uint8_t binaryTelemetryStop;
 uint8_t binaryTelemRows;
@@ -70,24 +71,36 @@ void binarySendShort(uint16_t i) {
     binarySendChar(*c++);
 }
 
-void binaryProcessAck(void) {
-    while (sendAck || sendNack) {
+void binaryProcessResponses(void) {
+    while (sendAck || sendNack || sendParamId) {
     serialPrint("AqC");
     outChkA = outChkB = 0;
 
-    // (N)ACK + checksum chars
-    binarySendChar(1 + 2);
-
     if (sendAck) {
+            // ACK + checksum chars
+            binarySendChar(1 + 2);
+
         binarySendChar(BINARY_COMMAND_ACK);
         binarySendShort(sendAck);
         sendAck = 0;
     }
-    else {
+    else if (sendNack) {
+            // NACK + checksum chars
+            binarySendChar(1 + 2);
+
         binarySendChar(BINARY_COMMAND_NACK);
         binarySendShort(sendNack);
         sendNack = 0;
     }
+        else if (sendParamId) {
+            // command + paramId + checksum chars
+            binarySendChar(1 + 2 + 2);
+
+            binarySendChar(BINARY_COMMAND_GET_PARAM_ID);
+            binarySendShort(sendParamId);
+            binarySendShort(paramId);
+            sendParamId = 0;
+        }
 
     serialWrite(outChkA);
     serialWrite(outChkB);
@@ -99,7 +112,7 @@ void binaryTelemSend(void) {
     serialWrite(outChkB);
 
     // process any (N)Acks between telemetry packets
-    binaryProcessAck();
+    binaryProcessResponses();
 
     if (!binaryTelemetryStop) {
     serialPrint("AqT");
@@ -262,6 +275,11 @@ void binaryCommandParse(void) {
     }
     break;
 
+    case BINARY_COMMAND_GET_PARAM_ID:
+        paramId = configGetId((char *)&commandBuf.params[0]);
+        sendParamId = commandBuf.seqId;
+        break;
+
     case BINARY_COMMAND_CONFIG:
     switch ((int)commandBuf.params[0]) {
         case 0:
@@ -287,8 +305,7 @@ void binaryCommandParse(void) {
 
     // only if telem is not running
     if (!binaryTelemRate)
-    binaryProcessAck();
-
+    binaryProcessResponses();
 }
 
 void binaryCommandRead(void) {

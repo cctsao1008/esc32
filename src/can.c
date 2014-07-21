@@ -242,7 +242,7 @@ static inline void canProcessSet(canPacket_t *pkt) {
     canNack(pkt);
     break;
 
-    case CAN_DATA_PARAM:
+    case CAN_DATA_PARAM_ID:
     canSetParam(pkt);
     break;
 
@@ -253,6 +253,7 @@ static inline void canProcessSet(canPacket_t *pkt) {
 }
 
 static inline void canProcessGet(canPacket_t *pkt) {
+    int16_t paramId;
     uint8_t *p1, *p2;
 
     switch (pkt->doc) {
@@ -287,7 +288,7 @@ static inline void canProcessGet(canPacket_t *pkt) {
     canReply(pkt, 1);
     break;
 
-    case CAN_DATA_PARAM:
+    case CAN_DATA_PARAM_ID:
     if (*((uint16_t *)pkt->data) < CONFIG_NUM_PARAMS) {
         float val = p[*((uint16_t *)pkt->data)];
 
@@ -295,6 +296,27 @@ static inline void canProcessGet(canPacket_t *pkt) {
         canReply(pkt, 4);
     }
     else {
+        canNack(pkt);
+    }
+    break;
+
+    case CAN_DATA_PARAM_NAME1:
+        ((uint32_t *)canData.paramName)[0] = pkt->data[0];
+        ((uint32_t *)canData.paramName)[1] = pkt->data[1];
+        canAck(pkt);
+        break;
+
+    case CAN_DATA_PARAM_NAME2:
+        ((uint32_t *)canData.paramName)[2] = pkt->data[0];
+        ((uint32_t *)canData.paramName)[3] = pkt->data[1];
+
+        paramId = configGetId((char *)canData.paramName);
+
+        if (paramId >= 0) {
+            ((uint16_t *)pkt->data)[0] = paramId;
+            canReply(pkt, 2);
+        }
+        else {
         canNack(pkt);
     }
     break;

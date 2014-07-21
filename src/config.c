@@ -193,7 +193,7 @@ int configGetId(char *param) {
     int i;
 
     for (i = 0; i < CONFIG_NUM_PARAMS; i++)
-    if (!strncasecmp(configParameterStrings[i], param, strlen(configParameterStrings[i])))
+    if (!strncasecmp(configParameterStrings[i], param, 16))
         return i;
 
     return -1;

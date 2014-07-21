@@ -25,7 +25,7 @@
 #include <string.h>
 
 uint8_t owROMCode[8];
-uint8_t owBuf[16];
+uint8_t owBuf[32];
 uint8_t *owBufPointer;
 uint8_t owState;
 uint8_t owLastCommand;
@@ -143,8 +143,32 @@ void owReadComplete(void) {
 
     case OW_VERSION:
         owState = OW_WRITE;
-        owBufPointer = (uint8_t *)version;
+        owBufPointer = version;
         owWriteBytes(sizeof(version));
+    break;
+
+    case OW_GET_PARAM_ID:
+        if (owLastCommand != owBuf[0]) {
+        owLastCommand = owBuf[0];
+        // read an additional 16 bytes
+        owBufPointer = &owBuf[1];
+        owReadBytes(16);
+        }
+        else {
+                int16_t paramId;
+
+        owLastCommand = 0x00;
+                paramId = configGetId((char *)&owBuf[1]);
+
+                // copy config value into send buffer
+                pointer = (uint8_t *)&paramId;
+                owBuf[1] = pointer[0];
+                owBuf[2] = pointer[1];
+
+                owState = OW_WRITE;
+                owBufPointer = owBuf;
+                owWriteBytes(3);
+        }
     break;
 
     case OW_PARAM_READ:
@@ -182,10 +206,10 @@ void owReadComplete(void) {
         owLastCommand = 0x00;
         if (owBuf[1] < CONFIG_NUM_PARAMS) {
             // set parameter
-            configSetParamByID(owBuf[1], (float)owBuf[2]);
+            configSetParamByID(owBuf[1], *(float *)(&owBuf[2]));
 
             // copy config value into send buffer
-            pointer = (uint8_t *)&(p[owBuf[1]]);
+            pointer = (uint8_t *)&p[owBuf[1]];
             owBuf[2] = pointer[0];
             owBuf[3] = pointer[1];
             owBuf[4] = pointer[2];

@@ -114,9 +114,12 @@ enum {
     CAN_DATA_INPUT_MODE,
     CAN_DATA_RUN_MODE,
     CAN_DATA_STATE,
-    CAN_DATA_PARAM,
+    CAN_DATA_PARAM_ID,
     CAN_DATA_TELEM,
-    CAN_DATA_VERSION
+    CAN_DATA_VERSION,
+    CAN_DATA_VALUE,
+    CAN_DATA_PARAM_NAME1,
+    CAN_DATA_PARAM_NAME2
 };
 
 // telemetry values
@@ -182,6 +185,7 @@ typedef struct {
     uint32_t uuid;
     uint32_t mailboxFull;
     uint32_t packetsReceived;
+    uint8_t paramName[16];
     uint16_t telemRate;
     uint8_t telemValues[CAN_TELEM_NUM];
     uint8_t networkId;
