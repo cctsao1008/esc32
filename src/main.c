@@ -55,7 +55,9 @@ int main(void) {
     adcInit();
     fetInit();
     serialInit();
+    #if 0
     canInit();
+    #endif
     runInit();
     cliInit();
     owInit();
@@ -89,16 +91,18 @@ int main(void) {
         *SCB_DEMCR = *SCB_DEMCR | 0x01000000;
         *DWT_CONTROL = *DWT_CONTROL | 1;    // enable the counter
 
-    minCycles = 0xffff;
+        minCycles = 0xffff;
+
         while (1) {
             idleCounter++;
 
-        if (runCount != lastRunCount && !(runCount % (RUN_FREQ / 1000))) {
-        if (commandMode == CLI_MODE)
-            cliCheck();
-        else
-            binaryCheck();
-        lastRunCount = runCount;
+            if (runCount != lastRunCount && !(runCount % (RUN_FREQ / 1000))) {
+                if (commandMode == CLI_MODE)
+                cliCheck();
+            else
+                binaryCheck();
+
+            lastRunCount = runCount;
         }
 
             thisCycles = *DWT_CYCCNT;
@@ -111,7 +115,7 @@ int main(void) {
                 minCycles = cycles;
         }
     }
-    
+
     return 0;
 }
 

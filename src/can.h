@@ -76,17 +76,19 @@
 // 6 bits [5:0]
 #define CAN_SEQ_MASK        ((uint32_t)0x3f<<3)
 
+// types
 enum {
     CAN_TYPE_ESC = 1,
     CAN_TYPE_SERVO,
     CAN_TYPE_SENSOR,
-    CAN_TYPE_LED,
+    CAN_TYPE_SWITCH,
     CAN_TYPE_OSD,
     CAN_TYPE_UART,
     CAN_TYPE_HUB,
     CAN_TYPE_NUM
 };
 
+// commands
 enum {
     CAN_CMD_DISARM = 1,
     CAN_CMD_ARM,
@@ -104,9 +106,13 @@ enum {
     CAN_CMD_BEEP,
     CAN_CMD_POS,
     CAN_CMD_USER_DEFINED,
-    CAN_CMD_RESET
+    CAN_CMD_RESET,
+    CAN_CMD_STREAM,
+    CAN_CMD_ON,
+    CAN_CMD_OFF
 };
 
+// data types
 enum {
     CAN_DATA_GROUP = 1,
     CAN_DATA_TYPE,

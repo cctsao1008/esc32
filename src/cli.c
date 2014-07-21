@@ -524,9 +524,9 @@ char *cliTabComplete(char *name, int len) {
     for (i = 0; i < CLI_N_CMDS; i++)
     if (!strncasecmp(name, cliCommandTable[i].name, len)){
         if (i+1 < CLI_N_CMDS && !strncasecmp(name, cliCommandTable[i+1].name, len))
-        return 0;
+            return 0;
         else
-        return cliCommandTable[i].name;
+            return cliCommandTable[i].name;
     }
 
     return 0;
