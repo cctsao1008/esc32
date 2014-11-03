@@ -77,7 +77,7 @@ LDFLAGS			= -lm \
 			$(ARCH_FLAGS) \
 			-static \
 			-Wl,-gc-sections  \
-			-specs=nano.specs \
+			--specs=nano.specs \
 			-u _printf_float \
 			-u _scanf_float \
 			-T$(LD_SCRIPT)

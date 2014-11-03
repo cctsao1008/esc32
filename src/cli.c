@@ -632,7 +632,7 @@ void cliCheck(void) {
 void cliInit(void) {
     serialPrint(cliHome);
     serialPrint(cliClear);
-    sprintf(version, "%s.%d", VERSION, getBuildNumber());
+    sprintf(version, "%s.%d (tw)", VERSION, getBuildNumber());
 
     cliFuncVer(0, 0);
     serialPrint("\r\nCLI ready.\r\n");

@@ -19,6 +19,8 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
+#define USER_CONFIG
+
 #define DEFAULT_CONFIG_VERSION      2.01f
 #define DEFAULT_STARTUP_MODE        0.0f
 #define DEFAULT_BAUD_RATE           230400
@@ -29,6 +31,7 @@
 #define DEFAULT_ITERM               0.0006f
 #define DEFAULT_INFAC               0.15f
 
+#if defined(USER_CONFIG)
 #define DEFAULT_FF1TERM             0.0f
 #define DEFAULT_FF2TERM             0.0f
 
@@ -40,14 +43,33 @@
 
 #define DEFAULT_THR1TERM            0.0f
 #define DEFAULT_THR2TERM            1.0f
+#else
+#define DEFAULT_FF1TERM             0.0f
+#define DEFAULT_FF2TERM             0.0f
+
+#define DEFAULT_CL1TERM             0.0f
+#define DEFAULT_CL2TERM             0.0f
+#define DEFAULT_CL3TERM             0.0f
+#define DEFAULT_CL4TERM             0.0f
+#define DEFAULT_CL5TERM             0.0f
+
+#define DEFAULT_THR1TERM            0.0f
+#define DEFAULT_THR2TERM            1.0f
+#endif
 
 #define DEFAULT_SHUNT_RESISTANCE    0.5f        // milli Ohms
 #define DEFAULT_MIN_PERIOD          50.0f       // us
 #define DEFAULT_MAX_PERIOD          12000.0f    // us
 #define DEFAULT_BLANKING_MICROS     30.0f       // us
+
+#if defined(USER_CONFIG)
+#define DEFAULT_ADVANCE             22.0f       // electrical degrees
+#else
 #define DEFAULT_ADVANCE             10.0f       // electrical degrees
+#endif
+
 #define DEFAULT_START_VOLTAGE       1.1f        // voltage used to start motor
-#define DEFAULT_START_ALIGN_TIME    600     // ms to align rotor in known position
+#define DEFAULT_START_ALIGN_TIME    600         // ms to align rotor in known position
 #define DEFAULT_START_ALIGN_VOLTAGE 0.9f        // max voltage during align (around 0.8 * START_VOLTAGE)
 #define DEFAULT_START_STEPS_NUM     0.0f        // steps without commutation
 #define DEFAULT_START_STEPS_PERIOD  16000       // us betweet steps
@@ -55,13 +77,19 @@
 #define DEFAULT_GOOD_DETECTS_START  75.0f       // after which will go into RUNNING mode
 #define DEFAULT_BAD_DETECTS_DISARM  48.0f       // after which will go into DISARMED mode
 #define DEFAULT_MAX_CURRENT         20.0f       // amps
+
+#if defined(USER_CONFIG)
+#define DEFAULT_SWITCH_FREQ         24.0f       // output PWM frequency in KHz
+#define DEFAULT_MOTOR_POLES         24.0f
+#else
 #define DEFAULT_SWITCH_FREQ         20.0f       // output PWM frequency in KHz
 #define DEFAULT_MOTOR_POLES         14.0f
+#endif
 
 #define DEFAULT_PWM_MIN_PERIOD      2200        // minimum valid period
 #define DEFAULT_PWM_MAX_PERIOD      25000       // maximum valid period
 
-#define DEFAULT_PWM_MIN_VALUE       750     // minimum to consider pulse a valid signal
+#define DEFAULT_PWM_MIN_VALUE       750         // minimum to consider pulse a valid signal
 #define DEFAULT_PWM_LO_VALUE        1000        // lowest running value
 #define DEFAULT_PWM_HI_VALUE        1950        // highest running value
 #define DEFAULT_PWM_MAX_VALUE       2250        // maximum to consider pulse a valid signal
