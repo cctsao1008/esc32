@@ -18,7 +18,7 @@ notifications:
     on_failure: always
 deploy:
   provider: releases
-  api-key: token
+  api-key: $TOKEN
   file: "bin/ESC32.hex"
   skip_cleanup: true
   on:
