@@ -16,10 +16,3 @@ notifications:
       - chiacheng.tsao@gmail.com
     on_success: always
     on_failure: always
-deploy:
-  provider: releases
-  api-key: "23621865c4f1cf3cf96b8c5974cb934bb4d5732a"
-  file: "bin/ESC32.hex"
-  skip_cleanup: true
-  on:
-    all_branches: true
