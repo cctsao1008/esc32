@@ -18,7 +18,7 @@ notifications:
     on_failure: always
 deploy:
   provider: releases
-  api-key: "GITHUB OAUTH TOKEN"
+  api-key: token
   file: "bin/ESC32.hex"
   skip_cleanup: true
   on:
