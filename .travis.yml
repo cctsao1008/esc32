@@ -1,7 +1,4 @@
 language: c
-notifications:
-  email:
-    - chiacheng.tsao@gmail.com
 before_install:
  - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
  - sudo apt-get update
@@ -13,3 +10,9 @@ before_script:
 compiler:
   - gcc
 script: make
+notifications:
+  email:
+    recipients:
+      - chiacheng.tsao@gmail.com
+    on_success: always
+    on_failure: always
