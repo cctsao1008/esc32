@@ -8,7 +8,7 @@ language:
 before_install:
   - sudo add-apt-repository -y ppa:terry.guo/gcc-arm-embedded
   - sudo apt-get update
-  - sudo apt-get install -y gcc-arm-none-eabi symlinks build-essential
+  - sudo apt-get install -y gcc-arm-none-eabi symlinks build-essential libplplot-dev
 
 before_script:
   - arm-none-eabi-gcc --version
@@ -17,6 +17,9 @@ compiler:
   - gcc
 
 script:
+  - make clean
+  - make
+  - cd ground
   - make clean
   - make
 
