@@ -26,7 +26,7 @@ loader: loader.o serial.o stmbootloader.o
 	$(CC) -o loader $(ALL_CFLAGS) loader.o serial.o stmbootloader.o
 
 esc32Cal: esc32Cal.o serial.o
-	$(CC) -o esc32Cal $(ALL_CFLAGS) esc32Cal.o serial.o -L/opt/local/lib -lplplotd -lpthread
+	$(CC) -o esc32Cal $(ALL_CFLAGS) esc32Cal.o serial.o -lplplotd -lpthread
 
 loader.o: loader.c serial.h stmbootloader.h
 	$(CC) -c $(ALL_CFLAGS) loader.c
@@ -38,7 +38,7 @@ serial.o: serial.c serial.h
 	$(CC) -c $(ALL_CFLAGS) serial.c
 
 esc32Cal.o: esc32Cal.cc esc32.h
-	$(CC) -c $(ALL_CFLAGS) esc32Cal.cc -I/opt/local/include -I/usr/local/include/eigen3
+	$(CC) -c $(ALL_CFLAGS) esc32Cal.cc -I/usr/include/eigen3
 
 clean:
 	rm -f loader esc32Cal *.o
