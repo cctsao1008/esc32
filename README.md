@@ -1,5 +1,6 @@
-esc32  [![Build Status](https://travis-ci.org/cctsao1008/esc32.svg?branch=master)](https://travis-ci.org/cctsao1008/esc32)
+esc32
 =====
+[![Build Status](https://drone.io/github.com/cctsao1008/esc32/status.png)](https://drone.io/github.com/cctsao1008/esc32/latest)
 
 ESC32 –  a yet unseen electronic speed controller
 
